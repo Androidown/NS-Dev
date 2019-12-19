@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "switch",
+            "includePath": [
+                "C:/devkitPro/devkitA64/aarch64-none-elf/include",
+                "C:/devkitPro/libnx/include",
+                "${workspaceFolder}/**"
+            ],
+            "compilerPath": "C:/devkitPro/devkitA64/bin/aarch64-none-elf-gcc.exe",
+            "cStandard": "c11",
+            "intelliSenseMode": "gcc-x64",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

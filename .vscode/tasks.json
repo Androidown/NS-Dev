@@ -1,0 +1,30 @@
+{
+// 有关 tasks.json 格式的文档，请参见
+    // https://go.microsoft.com/fwlink/?LinkId=733558
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "switch build",
+            "command": "C:\\devkitPro\\devkitA64\\bin\\aarch64-none-elf-gcc.exe",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "-I",
+                "C:/devkitPro/libnx/include",
+                "-g", // 生成和调试有关的信息
+                "-Wall", // 开启额外警告
+                "-static-libgcc", // 静态链接libgcc，一般都会加上
+            ],
+            "options": {
+                "cwd": "C:\\devkitPro\\devkitA64\\bin"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+              }
+        }
+    ]
+}
