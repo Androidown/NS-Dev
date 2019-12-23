@@ -6,13 +6,13 @@
 // Include the main libnx system header, for Switch development
 #include <switch.h>
 #include "log.h"
+#include "frame.h"
 
 // Sysmodules should not use applet*.
 u32 __nx_applet_type = AppletType_None;
 TimeServiceType __nx_time_service_type = TimeServiceType_Menu;
 bool ChangeDateTrigger = false;
 bool Exit = false;
-char *LOGFILE = "/sys_time_changer.log";
 
 // Adjust size as needed.
 #define INNER_HEAP_SIZE 0x000320000
@@ -90,7 +90,7 @@ void __attribute__((weak)) __appExit(void)
 }
 
 
-void inputPoller()
+int inputPoller()
 {
     hidScanInput();
     u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
@@ -101,73 +101,77 @@ void inputPoller()
     {
         strcpy(logMsg,  "Hold MINUS & Y detected.\n");
         logInfo(LOGFILE, logMsg);
-        ChangeDateTrigger = true;
+        return 1;
     }
     if ((kDown & KEY_MINUS || kDown & KEY_B) && (kHeld & KEY_MINUS && kHeld & KEY_B))
     {
         strcpy(logMsg,  "Hold MINUS & B detected.\n");
         logInfo(LOGFILE, logMsg);
-        ChangeDateTrigger = false;
+        return 2;
     }
     if ((kDown & KEY_MINUS || kDown & KEY_X) && (kHeld & KEY_MINUS && kHeld & KEY_X))
     {
         strcpy(logMsg,  "Hold MINUS & X detected.\n");
         logInfo(LOGFILE, logMsg);
-        ChangeDateTrigger = false;
-        Exit = true;
+        return 0;
     }
 }
 
-Result setDateToNextDay(u64 cur_day, u64 *next_day)
-{
-    *next_day = cur_day + 24*60*60;
-    return timeSetCurrentTime(TimeType_LocalSystemClock, *next_day);
-}
 
 // Main program entrypoint
 int main(int argc, char* argv[])
 {
-    // Other initialization goes here. As a demonstration, we print hello world.
     u64 current_date = 1573776600;
-    u64 next_date;
     Result rc;
     int i;
+    int ope_flag, frame_number, sl_cnt;
     char logMsg[32];
 
-    strcpy(logMsg,  "Write first log.\n");
+    strcpy(logMsg,  "Application started.\n");
     logInfo(LOGFILE, logMsg);
 
     // Main loop
     while (appletMainLoop() && (!Exit))
     {
-        inputPoller();
+        ope_flag = inputPoller();
 
-        if (ChangeDateTrigger)
+        switch(ope_flag)
         {
-            strcpy(logMsg,  "Change date enabled.\n");
-            logInfo(LOGFILE, logMsg);
-            for(i=0; i<10; i++)
+            case 1: // move frame forward by input number.
             {
-                rc = setDateToNextDay(current_date, &next_date);
-                if (R_FAILED(rc))
-                {
-                    strcpy(logMsg, "Unable to set local time.\n");
-                    logInfo(LOGFILE, logMsg);
-                } 
-                else
-                {
-                    current_date = next_date;
-                    timeGetCurrentTime (TimeType_LocalSystemClock, &next_date);
-
-                    strcpy(logMsg, "Time is set to next_date.\n");
-                    logInfo(LOGFILE, logMsg);
-                } 
-
+                strcpy(logMsg,  "MODE: specific frame number.\n");
+                logInfo(LOGFILE, logMsg);
+                frame_number = frameGetNumber();
+                sprintf(logMsg,  "Will move frame forward by: %d.\n", frame_number);
+                logInfo(LOGFILE, logMsg);
+                for(i=0; i<frame_number; i++)
+                    frameForward(&current_date);
+                break;
             }
+
+            case 2: // S&L to get wanted PokeMon.
+            {
+                strcpy(logMsg,  "MODE: Frame forward by 3 and confirm.\n");
+                logInfo(LOGFILE, logMsg);
+                vhidNewController();
+                sl_cnt = frameSL(&current_date);
+                sprintf(logMsg,  "Break after %d times S&L: %d.\n", sl_cnt);
+                logInfo(LOGFILE, logMsg);
+                vhidDetachController();
+                break;
+            }
+
+            case 0:
+            {
+                Exit = true;
+                break;
+            }
+
         }
+        ope_flag = 255;        
     }
-    strcpy(logMsg,  "Exiting.\n");
+    strcpy(logMsg,  "Application exited.\n");
     logInfo(LOGFILE, logMsg);
-    // Deinitialize and clean up resources used by the console (important!)
+
     return 0;
 }
