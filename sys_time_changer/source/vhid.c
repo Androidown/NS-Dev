@@ -74,6 +74,9 @@ void vhidPressButtonAndWait(char button, s64 timeout)
     case 'H':
         state.buttons = KEY_HOME;
         break;
+    case 'R':
+        state.buttons = KEY_R;
+        break;
     default:
         break;
     }
@@ -83,7 +86,7 @@ void vhidPressButtonAndWait(char button, s64 timeout)
         logInfo(LOGFILE, "Failed to set state for vitual controller.\n");
     else
     {
-        svcSleepThread(2E+7L);
+        svcSleepThread(2E+8L);
         state.buttons = 0;
         hiddbgSetHdlsState(con_id, &state);
     }

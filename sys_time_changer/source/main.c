@@ -131,7 +131,6 @@ int main(int argc, char* argv[])
     {
         
         ope_flag = inputPoller();
-        svcSleepThread(1E+8L);
         switch(ope_flag)
         {
             case 1: // move frame forward by input number.
@@ -163,6 +162,7 @@ int main(int argc, char* argv[])
             }
 
         }
+        svcSleepThread(1E+8L);
         ope_flag = 255;        
     }
     logInfo(LOGFILE, "Application exited.\n");
