@@ -6,20 +6,22 @@
 // Include the main libnx system header, for Switch development
 #include <switch.h>
 #include "log.h"
-
+#include "vhid.h"
 
 void frameForward(u64 *cur_day)
 {
-    char logMsg[32];
     Result rc;
 
+    vhidPressButtonAndWait('A', 2E+9L); // start local connection
     *cur_day += 86400;  // one day equals to 86400 seconds.
     rc = timeSetCurrentTime(TimeType_LocalSystemClock, *cur_day);
     if (R_FAILED(rc))
-    {
-        strcpy(logMsg, "Unable to set local time.\n");
-        logInfo(LOGFILE, logMsg);
-    }
+        logInfo(LOGFILE, "Unable to set local time.\n");
+    vhidPressButtonAndWait('B', 1E+9L); // cancel local connection
+    vhidPressButtonAndWait('A', 2E+9L); // confirm cancel and return to wild area
+    vhidPressButtonAndWait('A', 2E+9L); // comunicate with raid
+    vhidPressButtonAndWait('A', 1E+9L); // confirm get watt
+    vhidPressButtonAndWait('A', 1E+9L); // show raid detail
 }
 
 int frameGetNumber()
@@ -27,7 +29,7 @@ int frameGetNumber()
     u64 kDown;
     int sum_up = 0;
     int cur_digit = 0;
-    do
+    while(appletMainLoop())
     {
         hidScanInput();
         kDown = hidKeysDown(CONTROLLER_P1_AUTO);
@@ -46,16 +48,18 @@ int frameGetNumber()
             sum_up /= 10;
             cur_digit = 0;
         }
-    } while (!(kDown & KEY_A));
+        svcSleepThread(1E+7L);
+    }
     
     return sum_up;
 }
 
-bool isWanted(HidControllerID con_id)
+bool isWanted()
 {
     u64 kDown;
+    HidControllerID con_id = hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1;
 
-    while(1)
+    while(appletMainLoop())
     {
         hidScanInput();
         kDown = hidKeysDown(con_id);
@@ -64,6 +68,8 @@ bool isWanted(HidControllerID con_id)
             return true;
         else if(kDown & KEY_DDOWN)
             return false;
+
+        svcSleepThread(1E+7L);
     }
 }
 
@@ -71,19 +77,28 @@ int frameSL(u64 *cur_day)
 {
     int i;
     int cnt=0;
-    HiddbgHdlsState state={0};
-    HidControllerID con_id = hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1;
-    
-    // Setup controller state.
-    state.batteryCharge = 4; // Set battery charge to full.
 
-    while(1)
+    while(appletMainLoop())
     {
         cnt ++;
         for(i=0; i<3; i++)
             frameForward(cur_day);
-        if(isWanted(con_id))
+        if(isWanted())
             break;
+        else // restart game
+        {
+            vhidPressButtonAndWait('H', 1E+9L);
+            vhidPressButtonAndWait('X', 1E+9L); //close game
+            vhidPressButtonAndWait('A', 1E+9L); //confirm close
+            vhidPressButtonAndWait('A', 1E+9L); //open game
+            vhidPressButtonAndWait('A', 15E+9L); //confirm user and wait to title scene
+            vhidPressButtonAndWait('A', 6E+9L); //start and wait for loading save data
+            vhidPressButtonAndWait('A', 2E+9L); //comunicate with raid
+            vhidPressButtonAndWait('A', 1E+9L); //confirm get watt
+            vhidPressButtonAndWait('A', 1E+9L); //show raid detail
+        }
+        
+        svcSleepThread(1E+8L);
     }
     return cnt;
 }

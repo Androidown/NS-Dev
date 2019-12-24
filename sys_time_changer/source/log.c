@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define FILE_MAX_SIZE (1024*1024)
 
 
 void logInfo(char* filename, char* buffer)

@@ -1,4 +1,3 @@
 
-char filename[] = "/sys_time_changer.log";
-#define LOGFILE filename
+#define LOGFILE "/sys_time_changer.log"
 void logInfo(char* filename, char* buffer);

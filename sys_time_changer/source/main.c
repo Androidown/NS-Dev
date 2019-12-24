@@ -36,7 +36,7 @@ void __libnx_initheap(void)
 void __attribute__((weak)) __appInit(void)
 {
     Result rc;
-    svcSleepThread(10000000000L);
+    svcSleepThread(15E+9L);
 
     // Initialize default services.
     rc = smInitialize();
@@ -99,20 +99,17 @@ int inputPoller()
 
     if ((kDown & KEY_MINUS || kDown & KEY_Y) && (kHeld & KEY_MINUS && kHeld & KEY_Y))
     {
-        strcpy(logMsg,  "Hold MINUS & Y detected.\n");
-        logInfo(LOGFILE, logMsg);
+        logInfo(LOGFILE, "Hold MINUS & Y detected.\n");
         return 1;
     }
     if ((kDown & KEY_MINUS || kDown & KEY_B) && (kHeld & KEY_MINUS && kHeld & KEY_B))
     {
-        strcpy(logMsg,  "Hold MINUS & B detected.\n");
-        logInfo(LOGFILE, logMsg);
+        logInfo(LOGFILE, "Hold MINUS & B detected.\n");
         return 2;
     }
     if ((kDown & KEY_MINUS || kDown & KEY_X) && (kHeld & KEY_MINUS && kHeld & KEY_X))
     {
-        strcpy(logMsg,  "Hold MINUS & X detected.\n");
-        logInfo(LOGFILE, logMsg);
+        logInfo(LOGFILE, "Hold MINUS & X detected.\n");
         return 0;
     }
 }
@@ -127,20 +124,19 @@ int main(int argc, char* argv[])
     int ope_flag, frame_number, sl_cnt;
     char logMsg[32];
 
-    strcpy(logMsg,  "Application started.\n");
-    logInfo(LOGFILE, logMsg);
+    logInfo(LOGFILE, "Application started.\n");
 
     // Main loop
-    while (appletMainLoop() && (!Exit))
+    while(appletMainLoop() && (!Exit))
     {
+        
         ope_flag = inputPoller();
-
+        svcSleepThread(1E+8L);
         switch(ope_flag)
         {
             case 1: // move frame forward by input number.
             {
-                strcpy(logMsg,  "MODE: specific frame number.\n");
-                logInfo(LOGFILE, logMsg);
+                logInfo(LOGFILE, "MODE: specific frame number.\n");
                 frame_number = frameGetNumber();
                 sprintf(logMsg,  "Will move frame forward by: %d.\n", frame_number);
                 logInfo(LOGFILE, logMsg);
@@ -151,8 +147,7 @@ int main(int argc, char* argv[])
 
             case 2: // S&L to get wanted PokeMon.
             {
-                strcpy(logMsg,  "MODE: Frame forward by 3 and confirm.\n");
-                logInfo(LOGFILE, logMsg);
+                logInfo(LOGFILE, "MODE: Frame forward by 3 and confirm.\n");
                 vhidNewController();
                 sl_cnt = frameSL(&current_date);
                 sprintf(logMsg,  "Break after %d times S&L: %d.\n", sl_cnt);
@@ -170,8 +165,7 @@ int main(int argc, char* argv[])
         }
         ope_flag = 255;        
     }
-    strcpy(logMsg,  "Application exited.\n");
-    logInfo(LOGFILE, logMsg);
+    logInfo(LOGFILE, "Application exited.\n");
 
     return 0;
 }

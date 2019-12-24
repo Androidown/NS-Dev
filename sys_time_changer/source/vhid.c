@@ -8,7 +8,6 @@
 
 u64 con_id = 0;
 
-
 int vhidNewController()
 {
     Result rc;
@@ -19,10 +18,7 @@ int vhidNewController()
     HiddbgHdlsDeviceInfo device = {0};
 
     if(R_FAILED(rc))
-    {
-        strcpy(logMsg, "Fail to create virtual controller.\n");
-        logInfo(LOGFILE, logMsg);
-    }
+        logInfo(LOGFILE, "Fail to create virtual controller.\n");
     else
         init_flag = 0;
 
@@ -48,8 +44,7 @@ int vhidNewController()
         else
         {
             init_flag = 1;
-            strcpy(logMsg, "Failed to attach a virtual controller.\n");
-            logInfo(LOGFILE, logMsg);
+            logInfo(LOGFILE, "Failed to attach a virtual controller.\n");
         }
         
     }
@@ -57,13 +52,44 @@ int vhidNewController()
 }
 
 
-vhidSetControllerState(HiddbgHdlsState *state, char button)
+void vhidPressButtonAndWait(char button, s64 timeout)
 {
+    HiddbgHdlsState state = {0};
+    state.batteryCharge = 4; // Set battery charge to full.
 
-    rc2 = hiddbgSetHdlsState(con_id, state);
-    if (R_FAILED(rc2)) printf("hiddbgSetHdlsState(): 0x%x\n", rc2);
+    switch (button)
+    {
+    case 'A':
+        state.buttons = KEY_A;
+        break;
+    case 'B':
+        state.buttons = KEY_B;
+        break;
+    case 'X':
+        state.buttons = KEY_X;
+        break;
+    case 'Y':
+        state.buttons = KEY_Y;
+        break;
+    case 'H':
+        state.buttons = KEY_HOME;
+        break;
+    default:
+        break;
+    }
 
+    Result rc2 = hiddbgSetHdlsState(con_id, &state);
+    if (R_FAILED(rc2))
+        logInfo(LOGFILE, "Failed to set state for vitual controller.\n");
+    else
+    {
+        svcSleepThread(2E+7L);
+        state.buttons = 0;
+        hiddbgSetHdlsState(con_id, &state);
+    }
+    svcSleepThread(timeout);
 }
+
 
 void vhidDetachController()
 {
