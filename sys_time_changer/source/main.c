@@ -7,6 +7,7 @@
 #include <switch.h>
 #include "log.h"
 #include "frame.h"
+#include "vhid.h"
 
 // Sysmodules should not use applet*.
 u32 __nx_applet_type = AppletType_None;
@@ -95,7 +96,6 @@ int inputPoller()
     hidScanInput();
     u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
     u64 kHeld = hidKeysHeld(CONTROLLER_P1_AUTO);
-    char logMsg[32];
 
     if ((kDown & KEY_MINUS || kDown & KEY_Y) && (kHeld & KEY_MINUS && kHeld & KEY_Y))
     {
@@ -112,6 +112,8 @@ int inputPoller()
         logInfo(LOGFILE, "Hold MINUS & X detected.\n");
         return 0;
     }
+    
+    return 255;
 }
 
 
@@ -119,10 +121,10 @@ int inputPoller()
 int main(int argc, char* argv[])
 {
     u64 current_date = 1573776600;
-    Result rc;
+    // Result rc;
     int i;
     int ope_flag, frame_number, sl_cnt;
-    char logMsg[32];
+    char logMsg[40];
 
     logInfo(LOGFILE, "Application started.\n");
 
@@ -137,10 +139,10 @@ int main(int argc, char* argv[])
             {
                 logInfo(LOGFILE, "MODE: specific frame number.\n");
                 frame_number = frameGetNumber();
-                sprintf(logMsg,  "Will move frame forward by: %d.\n", frame_number);
                 logInfo(LOGFILE, logMsg);
                 for(i=0; i<frame_number; i++)
                     frameForward(&current_date);
+                snprintf(logMsg, 40,  "Move frame forward by: %d.\n", frame_number);
                 break;
             }
 
@@ -149,7 +151,7 @@ int main(int argc, char* argv[])
                 logInfo(LOGFILE, "MODE: Frame forward by 3 and confirm.\n");
                 vhidNewController();
                 sl_cnt = frameSL(&current_date);
-                sprintf(logMsg,  "Break after %d times S&L: %d.\n", sl_cnt);
+                snprintf(logMsg, 40, "Break after %d times S&L.\n", sl_cnt);
                 logInfo(LOGFILE, logMsg);
                 vhidDetachController();
                 break;

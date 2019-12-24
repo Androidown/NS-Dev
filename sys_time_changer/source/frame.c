@@ -65,6 +65,7 @@ int frameGetNumberFromConfig()
 {
     char* conf_path = "/config/frame_walker";
     int frame_num = 0;
+    char logMsg[32];
 
     DIR* files = opendir(conf_path);
     struct dirent* hFile;
@@ -79,7 +80,7 @@ int frameGetNumberFromConfig()
             {
                 char* raw_num = hFile->d_name + 6;
                 frame_num = strtol(raw_num, NULL, 10);      
-                char* logMsg = sprintf("Get frame number %d.\n", frame_num);
+                snprintf(logMsg, 32, "Get frame number %d.\n", frame_num);
                 logInfo(LOGFILE, logMsg);
                 break;
             }

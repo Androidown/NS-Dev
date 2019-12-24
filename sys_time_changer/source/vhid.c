@@ -38,7 +38,7 @@ int vhidNewController()
         {
             // Attach a new virtual controller.
             rc = hiddbgAttachHdlsVirtualDevice(&con_id, &device);
-            sprintf(logMsg,"hiddbgAttachHdlsVirtualDevice(): 0x%x\n", rc);
+            snprintf(logMsg, 50, "Attached a new v-controller: 0x%x\n", rc);
             logInfo(LOGFILE, logMsg);
         }
         else
