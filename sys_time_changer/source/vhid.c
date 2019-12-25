@@ -12,7 +12,6 @@ int vhidNewController()
 {
     Result rc;
     rc = hiddbgInitialize();
-    char logMsg[50];
     int init_flag = 1;
     
     HiddbgHdlsDeviceInfo device = {0};
@@ -37,9 +36,8 @@ int vhidNewController()
         if(R_SUCCEEDED(rc))
         {
             // Attach a new virtual controller.
-            rc = hiddbgAttachHdlsVirtualDevice(&con_id, &device);
-            snprintf(logMsg, 50, "Attached a new v-controller: 0x%x\n", rc);
-            logInfo(LOGFILE, logMsg);
+            hiddbgAttachHdlsVirtualDevice(&con_id, &device);
+            logInfo(LOGFILE, "Attached a new v-controller.\n");
         }
         else
         {
@@ -54,7 +52,7 @@ int vhidNewController()
 
 void vhidPressButtonAndWait(char button, s64 timeout)
 {
-    HiddbgHdlsState state = {0};
+    HiddbgHdlsStateV7 state = {0};
     state.batteryCharge = 4; // Set battery charge to full.
 
     switch (button)

@@ -13,16 +13,16 @@ void frameForward(u64 *cur_day)
 {
     Result rc;
 
-    vhidPressButtonAndWait('A', 2E+9L); // start local connection
+    vhidPressButtonAndWait('A', 30E+8L); // start local connection
     *cur_day += 86400;  // one day equals to 86400 seconds.
     rc = timeSetCurrentTime(TimeType_LocalSystemClock, *cur_day);
     if (R_FAILED(rc))
         logInfo(LOGFILE, "Unable to set local time.\n");
-    vhidPressButtonAndWait('B', 1E+9L); // cancel local connection
-    vhidPressButtonAndWait('A', 2E+9L); // confirm cancel and return to wild area
-    vhidPressButtonAndWait('A', 2E+9L); // comunicate with raid
-    vhidPressButtonAndWait('A', 1E+9L); // confirm get watt
-    vhidPressButtonAndWait('A', 1E+9L); // show raid detail
+    vhidPressButtonAndWait('B', 4E+8L); // cancel local connection
+    vhidPressButtonAndWait('A', 35E+8L); // confirm cancel and return to wild area
+    vhidPressButtonAndWait('A', 4E+8L); // comunicate with raid
+    vhidPressButtonAndWait('A', 4E+8L); //confirm msg
+    vhidPressButtonAndWait('A', 10E+8L); //confirm get watt and show raid detail
 }
 
 int frameGetNumber()
@@ -94,9 +94,10 @@ int frameGetNumberFromConfig()
 }
 
 
-bool isWanted()
+bool isWanted(HidControllerID con_id)
 {
     u64 kDown;
+    bool is_wanted = false;
     HidControllerID con_id = hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1;
 
     while(appletMainLoop())
@@ -105,13 +106,23 @@ bool isWanted()
         kDown = hidKeysDown(con_id);
         
         if(kDown & KEY_DUP)
-            return true;
+        {
+            is_wanted = true;
+            logInfo(LOGFILE, "Frame accepted.\n");
+            break;
+        }
         else if(kDown & KEY_DDOWN)
-            return false;
-
-        svcSleepThread(1E+7L);
+        {
+            is_wanted = false;
+            logInfo(LOGFILE, "Frame rejected, continue...\n");
+            break;
+        }
+        else
+            svcSleepThread(1E+7L);
     }
+    return is_wanted;
 }
+
 
 int frameSL(u64 *cur_day)
 {
@@ -123,19 +134,17 @@ int frameSL(u64 *cur_day)
         cnt ++;
         for(i=0; i<3; i++)
             frameForward(cur_day);
-        if(isWanted())
+        if(isWanted(con_id))
             break;
         else // restart game
         {
             vhidPressButtonAndWait('H', 1E+9L);
             vhidPressButtonAndWait('X', 1E+9L); //close game
-            vhidPressButtonAndWait('A', 1E+9L); //confirm close
+            vhidPressButtonAndWait('A', 3E+9L); //confirm close
             vhidPressButtonAndWait('A', 1E+9L); //open game
-            vhidPressButtonAndWait('A', 15E+9L); //confirm user and wait to title scene
+            vhidPressButtonAndWait('A', 12E+9L); //confirm user and wait to title scene
             vhidPressButtonAndWait('A', 6E+9L); //start and wait for loading save data
-            vhidPressButtonAndWait('A', 2E+9L); //comunicate with raid
-            vhidPressButtonAndWait('A', 1E+9L); //confirm get watt
-            vhidPressButtonAndWait('A', 1E+9L); //show raid detail
+            vhidPressButtonAndWait('A', 1E+9L); // show raid detail
         }
         
         svcSleepThread(1E+8L);
@@ -146,14 +155,9 @@ int frameSL(u64 *cur_day)
 
 void frameSave()
 {
-    vhidPressButtonAndWait('B', 1E+9L); // cancel local connection
-    vhidPressButtonAndWait('A', 2E+9L); // confirm cancel and return to wild area
+    vhidPressButtonAndWait('B', 2E+9L); // cancel and return to wild area
     vhidPressButtonAndWait('X', 2E+9L); // open menu
     vhidPressButtonAndWait('R', 1E+9L); // shortcut to save
-    vhidPressButtonAndWait('A', 2E+9L); // confirm save
-    vhidPressButtonAndWait('B', 2E+9L); // exit from save scene
-    vhidPressButtonAndWait('B', 2E+9L); // close menu
-    vhidPressButtonAndWait('A', 2E+9L); // comunicate with raid
-    vhidPressButtonAndWait('A', 1E+9L); // confirm get watt
-    vhidPressButtonAndWait('A', 1E+9L); // show raid detail
+    vhidPressButtonAndWait('A', 3E+9L); // confirm save
+    vhidPressButtonAndWait('A', 2E+9L); // show raid detail
 }

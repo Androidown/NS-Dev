@@ -96,24 +96,30 @@ int inputPoller()
     hidScanInput();
     u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
     u64 kHeld = hidKeysHeld(CONTROLLER_P1_AUTO);
+    int ope_code = 255;
 
-    if ((kDown & KEY_MINUS || kDown & KEY_Y) && (kHeld & KEY_MINUS && kHeld & KEY_Y))
+    if ((kDown & KEY_L || kDown & KEY_DRIGHT) && (kHeld & KEY_L && kHeld & KEY_DRIGHT))
     {
-        logInfo(LOGFILE, "Hold MINUS & Y detected.\n");
-        return 1;
+        logInfo(LOGFILE, "Hold L & DRIGHT detected.\n");
+        ope_code = 1;
     }
-    if ((kDown & KEY_MINUS || kDown & KEY_B) && (kHeld & KEY_MINUS && kHeld & KEY_B))
+    if ((kDown & KEY_L || kDown & KEY_DLEFT) && (kHeld & KEY_L && kHeld & KEY_DLEFT))
     {
-        logInfo(LOGFILE, "Hold MINUS & B detected.\n");
-        return 2;
+        logInfo(LOGFILE, "Hold L & DLEFT detected.\n");
+        ope_code = 2;
     }
-    if ((kDown & KEY_MINUS || kDown & KEY_X) && (kHeld & KEY_MINUS && kHeld & KEY_X))
+    if ((kDown & KEY_L || kDown & KEY_DDOWN) && (kHeld & KEY_L && kHeld & KEY_DDOWN))
     {
-        logInfo(LOGFILE, "Hold MINUS & X detected.\n");
-        return 0;
+        logInfo(LOGFILE, "Hold L & DDOWN detected.\n");
+        ope_code = 254;
+    }
+    if ((kDown & KEY_L || kDown & KEY_X) && (kHeld & KEY_L && kHeld & KEY_X))
+    {
+        logInfo(LOGFILE, "Hold L & X detected.\n");
+        ope_code = 0;
     }
     
-    return 255;
+    return ope_code;
 }
 
 
@@ -137,22 +143,48 @@ int main(int argc, char* argv[])
         {
             case 1: // move frame forward by input number.
             {
+                timeSetCurrentTime(TimeType_LocalSystemClock, current_date);
                 logInfo(LOGFILE, "MODE: specific frame number.\n");
-                frame_number = frameGetNumber();
-                logInfo(LOGFILE, logMsg);
+                frame_number = frameGetNumberFromConfig();
+                vhidNewController();
                 for(i=0; i<frame_number; i++)
+                {
                     frameForward(&current_date);
+                    if(!(i % 500))
+                    {
+                        snprintf(logMsg, 40,  "Save at %d frame.\n", i);
+                        logInfo(LOGFILE, logMsg);
+                        frameSave();
+                    }
+                }
+
                 snprintf(logMsg, 40,  "Move frame forward by: %d.\n", frame_number);
+                logInfo(LOGFILE, logMsg);
+                vhidDetachController();
                 break;
             }
 
             case 2: // S&L to get wanted PokeMon.
             {
                 logInfo(LOGFILE, "MODE: Frame forward by 3 and confirm.\n");
+                HidControllerID con_id = hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1;
                 vhidNewController();
-                sl_cnt = frameSL(&current_date);
+                sl_cnt = frameSL(&current_date, con_id);
                 snprintf(logMsg, 40, "Break after %d times S&L.\n", sl_cnt);
                 logInfo(LOGFILE, logMsg);
+                vhidDetachController();
+                break;
+            }
+
+            case 254: // peserved for testing stuff.
+            {
+                logInfo(LOGFILE, "MODE: Test for fucntion.\n");
+                vhidNewController();
+                for(i=0; i<7; i++)
+                {
+                    frameForward(&current_date);
+                    if(!(i % 3)) frameSave();
+                }
                 vhidDetachController();
                 break;
             }
