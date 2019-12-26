@@ -167,9 +167,8 @@ int main(int argc, char* argv[])
             case 2: // S&L to get wanted PokeMon.
             {
                 logInfo(LOGFILE, "MODE: Frame forward by 3 and confirm.\n");
-                HidControllerID con_id = hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1;
                 vhidNewController();
-                sl_cnt = frameSL(&current_date, con_id);
+                sl_cnt = frameSL(&current_date);
                 snprintf(logMsg, 40, "Break after %d times S&L.\n", sl_cnt);
                 logInfo(LOGFILE, logMsg);
                 vhidDetachController();

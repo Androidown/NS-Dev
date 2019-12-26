@@ -52,7 +52,7 @@ int vhidNewController()
 
 void vhidPressButtonAndWait(char button, s64 timeout)
 {
-    HiddbgHdlsStateV7 state = {0};
+    HiddbgHdlsState state = {0};
     state.batteryCharge = 4; // Set battery charge to full.
 
     switch (button)

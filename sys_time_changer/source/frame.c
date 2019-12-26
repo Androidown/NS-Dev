@@ -18,8 +18,8 @@ void frameForward(u64 *cur_day)
     rc = timeSetCurrentTime(TimeType_LocalSystemClock, *cur_day);
     if (R_FAILED(rc))
         logInfo(LOGFILE, "Unable to set local time.\n");
-    vhidPressButtonAndWait('B', 4E+8L); // cancel local connection
-    vhidPressButtonAndWait('A', 35E+8L); // confirm cancel and return to wild area
+    vhidPressButtonAndWait('B', 5E+8L); // cancel local connection
+    vhidPressButtonAndWait('A', 40E+8L); // confirm cancel and return to wild area
     vhidPressButtonAndWait('A', 4E+8L); // comunicate with raid
     vhidPressButtonAndWait('A', 4E+8L); //confirm msg
     vhidPressButtonAndWait('A', 10E+8L); //confirm get watt and show raid detail
@@ -94,7 +94,7 @@ int frameGetNumberFromConfig()
 }
 
 
-bool isWanted(HidControllerID con_id)
+bool isWanted()
 {
     u64 kDown;
     bool is_wanted = false;
@@ -134,7 +134,7 @@ int frameSL(u64 *cur_day)
         cnt ++;
         for(i=0; i<3; i++)
             frameForward(cur_day);
-        if(isWanted(con_id))
+        if(isWanted())
             break;
         else // restart game
         {

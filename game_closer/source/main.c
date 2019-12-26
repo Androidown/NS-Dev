@@ -13,11 +13,13 @@ int main(int argc, char* argv[])
 {
     // 0x0100abf008968000
     u64 PMSW_TID = 72246641462509568L;
+    u64 RUNNING_TID;
     Result rc;
     consoleInit(NULL);
 
     // Other initialization goes here. As a demonstration, we print hello world.
     printf("Press A to terminate program.\n");
+    printf("Press B to see runnning programs.\n");
 
     // Main loop
     while (appletMainLoop())
@@ -28,12 +30,20 @@ int main(int argc, char* argv[])
         // hidKeysDown returns information about which buttons have been
         // just pressed in this frame compared to the previous one
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-
+        nsdevInitialize();
         if (kDown & KEY_A)
         {
             rc = nsdevTerminateProgram(PMSW_TID);
             if(R_FAILED(rc))
                 printf("Failed to terminate program.");
+        }
+        if (kDown & KEY_B)
+        {
+            rc = nsdevGetRunningApplicationProcessIdForDevelop(&RUNNING_TID);
+            if(R_FAILED(rc))
+                printf("Failed to get running program.");
+            else
+                printf("Runing programs: %ld\n", RUNNING_TID);
         }
         if (kDown & KEY_PLUS)
             break; // break in order to return to hbmenu
@@ -42,6 +52,7 @@ int main(int argc, char* argv[])
         consoleUpdate(NULL);
     }
     
+    nsdevExit();
     // Deinitialize and clean up resources used by the console (important!)
     consoleExit(NULL);
     return 0;
