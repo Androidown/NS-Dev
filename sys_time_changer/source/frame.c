@@ -126,9 +126,10 @@ bool isWanted()
 
 int frameSL(u64 *cur_day)
 {
-    int i;
-    int cnt=0;
-
+    int i, cnt=0;
+    Result rc;
+    u64 PMSW_TID = 72246641462509568L;
+    nsdevInitialize();
     while(appletMainLoop())
     {
         cnt ++;
@@ -138,9 +139,13 @@ int frameSL(u64 *cur_day)
             break;
         else // restart game
         {
-            vhidPressButtonAndWait('H', 1E+9L);
-            vhidPressButtonAndWait('X', 1E+9L); //close game
-            vhidPressButtonAndWait('A', 3E+9L); //confirm close
+            rc = nsdevTerminateProgram(PMSW_TID);
+            if(R_FAILED(rc))
+            {
+                logInfo(LOGFILE, "Failed to terminate program.\n");
+                break;
+            }
+            vhidPressButtonAndWait('A', 1E+9L); //confirm process closing error
             vhidPressButtonAndWait('A', 1E+9L); //open game
             vhidPressButtonAndWait('A', 12E+9L); //confirm user and wait to title scene
             vhidPressButtonAndWait('A', 6E+9L); //start and wait for loading save data
@@ -149,6 +154,7 @@ int frameSL(u64 *cur_day)
         
         svcSleepThread(1E+8L);
     }
+    nsdevExit();
     return cnt;
 }
 

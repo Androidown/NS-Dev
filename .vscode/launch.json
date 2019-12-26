@@ -5,25 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "switch",
+            "name": "switch_dbg",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
-            "args": [],
+            "logging": { "engineLogging": true } ,
+            "program": "${fileDirname}\\${fileBasenameNoExtension}.elf",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb",
-            "miDebuggerPath": "C:\\Program Files\\LLVM\\bin\\lldb-mi.exe",
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\devkitPro\\devkitA64\\bin\\aarch64-none-elf-gdb.exe",
             "setupCommands": [
                 {
-                    "description": "为 gdb 启用整齐打印",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "switch build"
+            "preLaunchTask": "switch_build"
         }
     ]
 }

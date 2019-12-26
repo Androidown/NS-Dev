@@ -18,9 +18,15 @@ int main(int argc, char* argv[])
     consoleInit(NULL);
 
     // Other initialization goes here. As a demonstration, we print hello world.
-    printf("Press A to terminate program.\n");
-    printf("Press B to see runnning programs.\n");
+    printf("Press A to open program.\n");
+    printf("Press B to terminate programs.\n");
 
+    NsLaunchProperties nsp = {0};
+    nsp.program_id = PMSW_TID;
+    nsp.storageID = NcmStorageId_SdCard;
+    nsp.is_application = 1;
+    nsp.version = 1;
+    nsp.index;
     // Main loop
     while (appletMainLoop())
     {
@@ -33,17 +39,15 @@ int main(int argc, char* argv[])
         nsdevInitialize();
         if (kDown & KEY_A)
         {
-            rc = nsdevTerminateProgram(PMSW_TID);
+            rc = nsdevLaunchProgram(&RUNNING_TID, &nsp, 16);
             if(R_FAILED(rc))
-                printf("Failed to terminate program.");
+                printf("Failed to open program.\n");
         }
         if (kDown & KEY_B)
         {
-            rc = nsdevGetRunningApplicationProcessIdForDevelop(&RUNNING_TID);
+            rc = nsdevTerminateProgram(PMSW_TID);
             if(R_FAILED(rc))
-                printf("Failed to get running program.");
-            else
-                printf("Runing programs: %ld\n", RUNNING_TID);
+                printf("Failed to terminate program.\n");
         }
         if (kDown & KEY_PLUS)
             break; // break in order to return to hbmenu
