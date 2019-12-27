@@ -8,6 +8,7 @@
 #include <switch.h>
 #include "log.h"
 #include "vhid.h"
+#include "frame.h"
 
 void frameForward(u64 *cur_day)
 {
@@ -61,40 +62,50 @@ int frameGetNumber()
 }
 
 
-int frameGetNumberFromConfig()
+int _cmp(const void* a, const void* b)
+{
+    return *(int*)b - *(int*)a;
+}
+
+
+int frameReadConfig(int* frames, const char* prefix, bool single)
 {
     char* conf_path = "/config/frame_walker";
-    int frame_num = 0;
+    int read_num = 0, len_frames = 0;
     char logMsg[32];
-
+    
     DIR* files = opendir(conf_path);
     struct dirent* hFile;
 
-    if (files) 
+    if(files) 
     {
         while ((hFile = readdir(files)) != NULL) 
         {
             if(hFile->d_name[0] == '.') continue;
 
-            if(strstr( hFile->d_name, "frame."))
+            if(strstr( hFile->d_name, prefix))
             {
                 char* raw_num = hFile->d_name + 6;
-                frame_num = strtol(raw_num, NULL, 10);      
-                snprintf(logMsg, 32, "Get frame number %d.\n", frame_num);
+                read_num = strtol(raw_num, NULL, 10);      
+                snprintf(logMsg, 32, "Get config %s%d.\n", prefix, read_num);
                 logInfo(LOGFILE, logMsg);
-                break;
+                frames[len_frames++] = read_num;
+                if(single) break;
             }
         }
-        closedir( files );
+        closedir(files);
     }
 
-    if(!frame_num) logInfo(LOGFILE, "Failed to get frame number.\n");
-
-    return frame_num;
+    if(!read_num) 
+        logInfo(LOGFILE, "Failed to read config.\n");
+    else
+        qsort(frames, len_frames, sizeof(int), _cmp);
+    
+    return len_frames;
 }
 
 
-bool isWanted()
+bool _isWantedByHand()
 {
     u64 kDown;
     bool is_wanted = false;
@@ -127,34 +138,16 @@ bool isWanted()
 int frameSL(u64 *cur_day)
 {
     int i, cnt=0;
-    Result rc;
-    u64 PMSW_TID = 72246641462509568L;
-    nsdevInitialize();
+
     while(appletMainLoop())
     {
         cnt ++;
         for(i=0; i<3; i++)
             frameForward(cur_day);
-        if(isWanted())
-            break;
-        else // restart game
-        {
-            rc = nsdevTerminateProgram(PMSW_TID);
-            if(R_FAILED(rc))
-            {
-                logInfo(LOGFILE, "Failed to terminate program.\n");
-                break;
-            }
-            vhidPressButtonAndWait('A', 1E+9L); //confirm process closing error
-            vhidPressButtonAndWait('A', 1E+9L); //open game
-            vhidPressButtonAndWait('A', 12E+9L); //confirm user and wait to title scene
-            vhidPressButtonAndWait('A', 6E+9L); //start and wait for loading save data
-            vhidPressButtonAndWait('A', 1E+9L); // show raid detail
-        }
-        
+        if(_isWantedByHand()) break;
+        else if(R_FAILED(frameSimpleRestart())) break;    
         svcSleepThread(1E+8L);
     }
-    nsdevExit();
     return cnt;
 }
 
@@ -166,4 +159,38 @@ void frameSave()
     vhidPressButtonAndWait('R', 1E+9L); // shortcut to save
     vhidPressButtonAndWait('A', 3E+9L); // confirm save
     vhidPressButtonAndWait('A', 2E+9L); // show raid detail
+}
+
+
+Result _frameRestartImpl(void (*func)(void))
+{
+    Result rc;
+    u64 PMSW_TID = 0x0100abf008968000;
+    nsdevInitialize();
+    rc = nsdevTerminateProgram(PMSW_TID);
+    if(R_FAILED(rc))
+        logInfo(LOGFILE, "Failed to terminate program.\n");
+    else
+    {
+        vhidPressButtonAndWait('A', 1E+9L); // confirm process closing error
+        if(func != NULL) func();
+        vhidPressButtonAndWait('A', 1E+9L); // open game
+        vhidPressButtonAndWait('A', 12E+9L); // confirm user and wait to title scene
+        vhidPressButtonAndWait('A', 6E+9L); // start and wait for loading save data
+        vhidPressButtonAndWait('A', 1E+9L); // show raid detail
+    }
+    nsdevExit();
+    return rc;
+}
+
+
+Result frameSimpleRestart()
+{
+    return _frameRestartImpl(NULL);
+}
+
+
+Result frameBackupRestart()
+{
+
 }

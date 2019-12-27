@@ -1,3 +1,4 @@
+#pragma once
 /*API for virtual human input devices, aka virtual controller*/
 
 int vhidNewController();

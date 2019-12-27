@@ -128,8 +128,10 @@ int main(int argc, char* argv[])
 {
     u64 current_date = 1573776600;
     // Result rc;
-    int i;
-    int ope_flag, frame_number, sl_cnt;
+    int i, cnt = 0;
+    int ope_flag, sl_cnt, frame_number;
+    int frame_move[1] = {0};
+    int frame_backup[20] = {0};
     char logMsg[40];
 
     logInfo(LOGFILE, "Application started.\n");
@@ -145,16 +147,19 @@ int main(int argc, char* argv[])
             {
                 timeSetCurrentTime(TimeType_LocalSystemClock, current_date);
                 logInfo(LOGFILE, "MODE: specific frame number.\n");
-                frame_number = frameGetNumberFromConfig();
+                frameReadConfig(frame_move, "frame.", true);
+                cnt = frameReadConfig(frame_backup, "backup.", false);
+                frame_number = frame_move[0];
                 vhidNewController();
                 for(i=0; i<frame_number; i++)
                 {
                     frameForward(&current_date);
-                    if(!(i % 500))
+                    if(cnt && (i == frame_backup[cnt-1]))
                     {
                         snprintf(logMsg, 40,  "Save at %d frame.\n", i);
                         logInfo(LOGFILE, logMsg);
                         frameSave();
+                        cnt-- ;
                     }
                 }
 
@@ -196,7 +201,7 @@ int main(int argc, char* argv[])
 
         }
         svcSleepThread(1E+8L);
-        ope_flag = 255;        
+        ope_flag = 255;
     }
     logInfo(LOGFILE, "Application exited.\n");
 
