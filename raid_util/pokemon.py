@@ -1,16 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 from functools import partial
-
-stat_map = {
-    "hp": 0,
-    "atk": 1,
-    "def": 2,
-    "spa": 3,
-    "spd": 4,
-    "spe": 5
-}
-
+from const import stats_map
 
 class PokeMon(object):
     def __init__(self):
@@ -28,7 +19,7 @@ class PokeMon(object):
             f"nature: {self.nature}\n" \
             f"ability: {self.ability}\n" \
             f"gender: {self.gender}\n" \
-            f"ec: {self.ec}, pid: {self.pid}\n"
+            f"ec: {hex(self.ec)}, pid: {hex(self.pid)}\n"
 
 
 class PokeMonTemplate(object):
@@ -42,10 +33,13 @@ class PokeMonTemplate(object):
 
     def set_iv(self, min_max, key, value):
         value = min(31, max(0, value))
-        if min_max.lower() == 'min':
-            self.IVs_min[stat_map[key.lower()]] = value
-        if min_max.lower() == 'max':
-            self.IVs_max[stat_map[key.lower()]] = value
+        modify_attr = getattr(self, "IVs_" + min_max.lower())
+        key = key.lower()
+        if key == "all":
+            for i in range(6):
+                modify_attr[i] = value
+        else:
+            modify_attr[stats_map[key]] = value
 
     def __contains__(self, item: PokeMon):
         if (self.shiny_type and item.shiny_type not in self.shiny_type) \
@@ -66,7 +60,7 @@ class PokeMonTemplate(object):
 
 if __name__ == '__main__':
     pmtpl = PokeMonTemplate()
-    pmtpl.set_iv_min_atk(10)
+    pmtpl.set_iv_min_all(10)
     # pmtpl.IVs_min[attr_map['atk'.lower()]] = 10
     print(pmtpl.IVs_min)
     print(pmtpl.IVs_max)

@@ -1,18 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-from pokemon import PokeMon
+from pokemon import PokeMon, PokeMonTemplate
 
 U32 = 2**32 - 1
 U64 = 2**64 - 1
-
+base_seed = 0x82A2B175229D6A5B
 
 def rotl(x, k):
     return ((x << k) | (x >> (64 - k))) & U64
 
 
+def search_back(seed, count=5):
+	for _ in range(count):
+		seed = ((seed|(U64+1)) - base_seed) & U64
+	return hex(seed)
+
 class XoroShiro(object):
     def __init__(self, seed):
-        self.seed = [seed & U64, 0x82A2B175229D6A5B]
+        self.seed = [seed & U64, base_seed]
 
     def __iter__(self):
         return self
@@ -22,8 +27,8 @@ class XoroShiro(object):
         rslt = sum(self.seed) & U64
 
         s1 ^= s0
-        self.seed[0] = rotl(s0, 24) ^ s1 ^ (s1 << 16) & U64
-        self.seed[1] = rotl(s1, 37) & U64
+        self.seed[0] = rotl(s0, 24) ^ s1 ^ ((s1 << 16) & U64)
+        self.seed[1] = rotl(s1, 37)
 
         return rslt
 
@@ -61,11 +66,10 @@ class PMGenerator(object):
         self.gender_ratio = gender_ratio
 
     def _pm_set_shiny(self):
-        pm = self.pm
         otid = self.xor.next_int()
-        pm.pid = pid = self.xor.next_int()
-        otsv = ((otid >> 16) ^ (otid & 0xFFFF)) >> 4
-        psv = ((pid >> 16) ^ (pid & 0xFFFF)) >> 4
+        self.pm.pid = pid = self.xor.next_int()
+        otsv = ((otid >> 16) ^ (otid & 0xffff)) >> 4
+        psv = ((pid >> 16) ^ (pid & 0xffff)) >> 4
 
         if otsv == psv:  # Shiny
             if (otid >> 16) ^ (otid & 0xffff) ^ (pid >> 16) ^ (pid & 0xffff):
@@ -124,6 +128,18 @@ class PMGenerator(object):
 
 
 if __name__ == '__main__':
-    pmg = PMGenerator(12142323553, 4, True, True)
-    for _ in range(100):
-        print(next(pmg))
+    pmg = PMGenerator(0x12314, 4, True, True)
+    pmtpl = PokeMonTemplate()
+    pmtpl.set_iv_min_all(31)
+    pmtpl.set_iv_min_spa(0)
+    pmtpl.shiny_type.add("square")
+    pmtpl.ability.add(2)
+    pmtpl.gender.add(1)
+
+    cnt = 0
+
+    while next(pmg) not in pmtpl:
+    	cnt += 1
+    	if cnt % 1000000 == 0:
+    		print(cnt)
+    print(search_back(pmg.next_seed))
