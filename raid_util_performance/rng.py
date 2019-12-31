@@ -29,10 +29,7 @@ class XoroShiro(object):
         self.seed = [self.next_seed, base_seed]
         self.next_seed = (self.next_seed + base_seed) & U64
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
+    def next(self):
         s0, s1 = self.seed
         rslt = (s0 + s1) & U64
 
@@ -57,17 +54,17 @@ class XoroShiro(object):
 
     def next_int(self, max_int):
         mask = self.next_p2(max_int)
-        rslt = next(self) & mask
+        rslt = self.next() & mask
 
         while rslt >= max_int:
-            rslt = next(self) & mask
+            rslt = self.next() & mask
         return rslt
 
     def next_u32(self):
-        rslt = next(self) & U32
+        rslt = self.next() & U32
 
         while rslt >=U32:
-            rslt = next(self) & U32
+            rslt = self.next() & U32
         return rslt
 
 
@@ -135,10 +132,7 @@ class PMFinder(object):
         nature = 1 << self.xor.next_int(25)
         return nature & self.nature 
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
+    def find(self):
         self.xor.next_u32()
         if self._pm_check_shiny() and \
                 self._pm_check_ivs() and \
@@ -165,7 +159,7 @@ if __name__ == '__main__':
 
     cnt = 0
 
-    while next(pmf) is False:
+    while pmf.find() is False:
     	cnt += 1
     	if cnt % 1000000 == 0:
     		print(cnt)
