@@ -4,7 +4,7 @@ from functools import partial
 from const import stats_map
 
 class PokeMon(object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.IVs = [-1] * 6
         self.shiny_type = set()
         self.nature = set()
@@ -12,6 +12,13 @@ class PokeMon(object):
         self.gender = set()
         self.ec = 0
         self.pid = 0
+
+        self._parse_kwargs(**kwargs)
+
+    def _parse_kwargs(self, **kwargs):
+        for k, v in kwargs.items():
+            if k in self.__dict__:
+                setattr(self, k, v)
 
     def __repr__(self):
         return f"IVs: {self.IVs}\n" \
@@ -64,6 +71,6 @@ if __name__ == '__main__':
     # pmtpl.IVs_min[attr_map['atk'.lower()]] = 10
     print(pmtpl.IVs_min)
     print(pmtpl.IVs_max)
-    pm = PokeMon()
+    pm = PokeMon(ec=0x234f23)
     pmtpl.shiny_type.add("square")
-    print(pm in pmtpl)
+    print(pm)

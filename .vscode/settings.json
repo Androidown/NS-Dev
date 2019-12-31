@@ -5,5 +5,12 @@
         "stdlib.h": "c",
         "log.h": "c",
         "switch.h": "c"
-    }
+    },
+    "code-runner.respectShebang": false,
+    "code-runner.executorMap": {
+        "python": "python3",
+    },
+    "python.pythonPath": "C:\\Users\\wwei4\\AppData\\Local\\Continuum\\anaconda3\\envs\\docomo_ai\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }

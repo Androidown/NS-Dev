@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 from pokemon import PokeMon, PokeMonTemplate
+import configparser
 
 U32 = 2**32 - 1
 U64 = 2**64 - 1
 base_seed = 0x82A2B175229D6A5B
+
+conf = configparser.ConfigParser()
+conf.read("ini/config.ini")
 
 def rotl(x, k):
     return ((x << k) | (x >> (64 - k))) & U64
@@ -17,7 +21,7 @@ def search_back(seed, count=5):
 
 class XoroShiro(object):
     def __init__(self, seed):
-        self.seed = [seed & U64, base_seed]
+        self.seed = [seed, base_seed]
 
     def __iter__(self):
         return self
@@ -127,19 +131,114 @@ class PMGenerator(object):
         return self.pm
 
 
+class PMFinder(object):
+    def __init__(self, seed, iv_count, allow_hidden, random_gender, tmpl: PokeMonTemplate, gender_ratio=127):
+        self.xor = None
+        self.seed = seed & U64
+
+        self.pm_tmpl = tmpl
+        self.iv_cnt = iv_count
+        self.hidden = allow_hidden
+        self.random_gender = random_gender
+        self.gender_ratio = gender_ratio
+
+
+    def _pm_check_shiny(self):
+        otid = self.xor.next_int()
+        pid = self.xor.next_int()
+        otsv = ((otid >> 16) ^ (otid & 0xffff)) >> 4
+        psv = ((pid >> 16) ^ (pid & 0xffff)) >> 4
+        shiny_type = "null"
+
+        if otsv == psv:  # Shiny
+            if (otid >> 16) ^ (otid & 0xffff) ^ (pid >> 16) ^ (pid & 0xffff):
+                shiny_type = "star"
+            else:
+                shiny_type = "square"
+        elif self.pm_tmpl.shiny_type:
+            return False
+        #     if psv != realTSV:  # Force PID to be shiny from the real TID/SID
+        #         high = (pid & 0xFFFF) ^ realTID ^ realSID ^ (shinyType == 1)
+        #         pid = (high << 16) | (pid & 0xFFFF)
+        # else:
+        #     if psv == realTSV:  # Force PID to be not shiny from the real TID/SID
+        #         pid ^= 0x10000000
+        
+        return shiny_type in self.pm_tmpl.shiny_type
+
+    def _pm_check_ivs(self):
+        xor = self.xor
+        ivs = [-1] * 6
+        i = 0
+        while i < self.iv_cnt:
+            stat = xor.next_int(6)
+            if self.pm_tmpl.IVs_max[stat] != 31:
+                return False
+            elif ivs[stat] == -1:
+                ivs[stat] = 31
+                i += 1
+
+        for i in range(6):
+            if ivs[i] == -1:
+                iv = xor.next_int(32)
+                if not (self.pm_tmpl.IVs_min[i] <= iv <= self.pm_tmpl.IVs_max[i]):
+                    return False
+
+        return True
+
+    def _pm_check_ability(self):
+        if self.hidden:
+            ability = self.xor.next_int(3)
+        else:
+            ability = self.xor.next_int(2)
+        return (not self.pm_tmpl.ability) or ability in self.pm_tmpl.ability
+
+    def _pm_check_gender(self):
+        if self.random_gender:
+            gender = int(self.xor.next_int(252) + 1  < self.gender_ratio)
+            return (not self.pm_tmpl.gender) or gender in self.pm_tmpl.gender
+        else:
+            return True
+
+    def _pm_check_nature(self):
+        nature = self.xor.next_int(25)
+        return (not self.pm_tmpl.nature) or nature in self.pm_tmpl.nature 
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self.xor = XoroShiro(self.seed)
+        self.xor.next_int()
+        if self._pm_check_shiny() and \
+                self._pm_check_ivs() and \
+                self._pm_check_ability() and \
+                self._pm_check_gender() and \
+                self._pm_check_nature():
+            return True
+
+        self.seed = (self.seed + base_seed) & U64
+        return False
+
+
 if __name__ == '__main__':
-    pmg = PMGenerator(0x12314, 4, True, True)
+    import time
+    start = time.time()
+    
     pmtpl = PokeMonTemplate()
     pmtpl.set_iv_min_all(31)
-    pmtpl.set_iv_min_spa(0)
-    pmtpl.shiny_type.add("square")
+    # pmtpl.set_iv_min_spa(0)
+    pmtpl.shiny_type.add("star")
     pmtpl.ability.add(2)
     pmtpl.gender.add(1)
+    pmf = PMFinder(0x12314, 4, True, True, pmtpl)
 
     cnt = 0
 
-    while next(pmg) not in pmtpl:
+    while next(pmf) is False:
     	cnt += 1
     	if cnt % 1000000 == 0:
     		print(cnt)
-    print(search_back(pmg.next_seed))
+    print(search_back(pmf.seed))
+
+    print(f"costs {time.time() - start}")
