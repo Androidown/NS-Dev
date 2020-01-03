@@ -1,0 +1,17 @@
+{
+  "seed": "0x12314", 
+  "iv_count": 4, 
+  "allow_hidden": true, 
+  "random_gender": true,
+  "gender_ratio": 127,
+
+  "filter": {
+    "shiny_type": ["square"],
+    "IVs_min": [31, 31, 31, 31, 31, 31],
+    "IVs_max": [31, 31, 31, 31, 31, 31],
+    "ability": ["H"],
+    "gender": ["female"],
+    "nature": ["Adamant"]
+  }
+
+}
