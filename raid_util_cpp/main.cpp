@@ -74,10 +74,29 @@ int main()
     }
     std::cout << "ability loaded." << '\n';
 
+    if (!filter["nature"].is_null())
+    {
+        for (it=filter["nature"].begin(); it != filter["nature"].end(); ++it)
+        {
+            if (it.value().is_string())
+            {
+                std::string val = it.value();
+                pm_tmpl.add_nature(val);
+            }
+            else if (it.value().is_number_unsigned())
+            {
+                int val = it.value();
+                pm_tmpl.add_nature(val);
+            }
+            
+        }
+    }
+    std::cout << "nature loaded." << '\n';
+
     if (!filter["IVs_max"].is_null())
     {
         std::vector<int> iv_max = filter["IVs_max"].get<std::vector<int>>();
-        pm_tmpl.setIVsMin(iv_max.data());
+        pm_tmpl.setIVsMax(iv_max.data());
     }
     std::cout << "Max IVs loaded." << '\n';
 
@@ -93,7 +112,7 @@ int main()
         throw "seed is not presented.\n";
     }
 
-    u64 seed = std::stoul(jsn["seed"].get<std::string>(), nullptr, 16);
+    u64 seed = std::stoull(jsn["seed"].get<std::string>(), nullptr, 16);
     std::cout << "seed loaded." << '\n';
 
     bool allow_hidden = jsn["allow_hidden"].get<bool>();
@@ -110,11 +129,13 @@ int main()
 
     PMFinder *pmf = new PMFinder(seed, iv_cnt, allow_hidden, random_gender, pm_tmpl, gender_ratio);
 
+    char key_in;
+    unsigned long long cnt = 0;
 
-    int cnt = 0;
+    loop: 
     while(!pmf->foundPM())
     {
-    	if(++cnt % 50000000 == 0)
+    	if(++cnt % 100000000 == 0)
         {
             std::cout << "Calculated " << cnt << " frames." << std::endl;
         }
@@ -122,10 +143,21 @@ int main()
     }
 
     std::cout << "Seed found at " << cnt << " frames." << std::endl;
-    std::cout << std::hex << 
+    std::cout << std::hex <<  "result seed 3frames back: " <<
     pmf->xoro->next_seed - BASE_SEED - BASE_SEED - BASE_SEED - BASE_SEED 
     << std::endl;
-    
+
+    std::cout << std::hex << "result seed: " <<
+    pmf->xoro->next_seed - BASE_SEED << std::endl;
+
+    std::cout << std::dec << "Press y|Y to continue." << std::endl;
+    key_in = std::cin.get();
+    if (key_in == 'y' || key_in == 'Y')
+    {
+        std::cin.get();
+        goto loop;
+    }
+
     delete pmf;
 
 }

@@ -1,17 +1,17 @@
 {
-  "seed": "0x12314", 
+  "seed": "0x6079AD03756216AE", 
   "iv_count": 4, 
   "allow_hidden": true, 
-  "random_gender": true,
+  "random_gender": false,
   "gender_ratio": 127,
 
   "filter": {
     "shiny_type": ["square"],
-    "IVs_min": [31, 31, 31, 31, 31, 31],
-    "IVs_max": [31, 31, 31, 31, 31, 31],
-    "ability": ["H"],
-    "gender": ["female"],
-    "nature": ["Adamant"]
+    "IVs_min": [31, 31, 31, 0, 31, 0],
+    "IVs_max": [31, 31, 31, 31, 31, 0],
+    "ability": [1, 2],
+    "gender": ["female", "male"],
+    "nature": ["Brave"]
   }
 
 }
