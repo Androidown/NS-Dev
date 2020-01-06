@@ -1,14 +1,18 @@
 #include <iostream>
+#include <memory>
 #include "util.hpp"
+
+using SP_BTMK = std::unique_ptr<BitMask>;
 
 
 class PMTemplate
 {
     private:
-        BitMask* bm_shiny_type;
-        BitMask* bm_nature;
-        BitMask* bm_ability;
-        BitMask* bm_gender;
+        SP_BTMK bm_shiny_type;
+        SP_BTMK bm_nature;
+        SP_BTMK bm_ability;
+        SP_BTMK bm_gender;
+        STOI_MAP *stoimap_col[4];
     public:
         int IVs_min[6] = {0};
         int IVs_max[6] = {31, 31, 31, 31, 31, 31};

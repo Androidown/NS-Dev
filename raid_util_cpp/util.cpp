@@ -2,10 +2,9 @@
 #include "util.hpp"
 
 BitMask::BitMask(int mask, STOI_MAP &bin_map)
-{
-    this->mask = mask;
-    this->bin_map = bin_map;
-}
+:bin_map(bin_map), mask(mask)
+{}
+
 
 BitMask& BitMask::add(std::string key)
 {
@@ -44,7 +43,8 @@ BitMask& BitMask::add(int key)
     return *this;
 }
 
+
 BitMask::~BitMask()
 {
-    delete &bin_map;
+    std::cout << "BitMask deleted." << std::endl;
 }

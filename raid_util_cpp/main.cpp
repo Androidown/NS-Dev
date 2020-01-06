@@ -1,6 +1,7 @@
 #include "pm_finder.hpp"
 #include "lib/json.hpp"
 #include <fstream>
+#include <memory>
 
 using json = nlohmann::json;
 
@@ -14,7 +15,8 @@ int main()
     in >> jsn;
     json filter = jsn["filter"];
 
-    PMTemplate &pm_tmpl = *new PMTemplate();
+    std::shared_ptr<PMTemplate> pmtl_sp(new PMTemplate());
+    PMTemplate& pm_tmpl = *pmtl_sp;
     std::cout << "Process start." << '\n';
 
     if (!filter["shiny_type"].is_null())
@@ -127,7 +129,7 @@ int main()
     int gender_ratio = jsn["gender_ratio"].get<int>();
     std::cout << "gender_ratio loaded." << '\n';
 
-    PMFinder *pmf = new PMFinder(seed, iv_cnt, allow_hidden, random_gender, pm_tmpl, gender_ratio);
+    std::unique_ptr<PMFinder> pmf(new PMFinder(seed, iv_cnt, allow_hidden, random_gender, pm_tmpl, gender_ratio));
 
     char key_in;
     unsigned long long cnt = 0;
@@ -157,7 +159,5 @@ int main()
         std::cin.get();
         goto loop;
     }
-
-    delete pmf;
 
 }

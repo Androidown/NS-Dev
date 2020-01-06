@@ -16,7 +16,7 @@ class XoroShiro
     u64 nextInt(u64 max_int);
     u64 nextU32();
     inline void nextFrame();
-
+    ~XoroShiro();
 };
 
 

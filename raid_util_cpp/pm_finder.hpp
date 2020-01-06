@@ -1,6 +1,9 @@
 #include <iostream>
+#include <memory>
 #include "xoroshiro.hpp"
 #include "pm_template.hpp"
+
+using UP_XORO = std::unique_ptr<XoroShiro>;
 
 class PMFinder
 {
@@ -18,14 +21,14 @@ class PMFinder
         int _gender;
 
     public:
-        XoroShiro *xoro;
+        UP_XORO xoro;
         int iv_cnt;
         bool allow_hidden;
         bool random_gender;
         u64 gender_ratio;
         bool foundPM();
 
-    PMFinder(u64 seed, int iv_count, bool allow_hidden, bool random_gender, PMTemplate &pm_tmpl, u64 gender_ratio);
+    PMFinder(u64 seed, int iv_count, bool allow_hidden, bool random_gender, PMTemplate& pm_tmpl, u64 gender_ratio);
     ~PMFinder();
 
 };

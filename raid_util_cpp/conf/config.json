@@ -6,7 +6,7 @@
   "gender_ratio": 127,
 
   "filter": {
-    "shiny_type": ["square"],
+    "shiny_type": ["null"],
     "IVs_min": [31, 31, 31, 0, 31, 0],
     "IVs_max": [31, 31, 31, 31, 31, 0],
     "ability": [1, 2],

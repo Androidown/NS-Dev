@@ -1,8 +1,8 @@
 #include "pm_finder.hpp"
 
-PMFinder::PMFinder(u64 seed, int iv_count, bool allow_hidden, bool random_gender, PMTemplate &pm_tmpl, u64 gender_ratio)
+PMFinder::PMFinder(u64 seed, int iv_count, bool allow_hidden, bool random_gender, PMTemplate& pm_tmpl, u64 gender_ratio)
 {
-    xoro = new XoroShiro(seed);
+    xoro = UP_XORO(new XoroShiro(seed));
 
     pm_tmpl.numerize();
     for(int i=0; i<6; i++)
@@ -128,5 +128,5 @@ bool PMFinder::foundPM()
 
 PMFinder::~PMFinder()
 {
-    delete xoro;
+    std::cout << "PMFinder deleted." << std::endl;
 }
