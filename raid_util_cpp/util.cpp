@@ -2,47 +2,51 @@
 #include "util.hpp"
 
 BitMask::BitMask(int mask, STOI_MAP &bin_map)
-:bin_map(bin_map), mask(mask)
-{}
-
-
-BitMask& BitMask::add(std::string key)
+    : _bin_map(bin_map), mask(mask)
 {
+    _max_mask = mask;
+}
 
-    auto rslt = bin_map.find(key);
-    assert(rslt != bin_map.end());
-    int val = rslt->second;
-
-    if (!added) 
+Result BitMask::add(int val)
+{
+    Result rc = 0;
+    if (val > _max_mask || val <= 0)
     {
-        this->mask = val;
-        added = true;
+        std::cout << "given value: " << val << " is not in range (0, " 
+                  << _max_mask << "]"  << std::endl;
+        rc = 1;
     }
     else
     {
-        this->mask |= val;
+        if (!_added)
+        {
+            this->mask = val;
+            _added = true;
+        }
+        else
+        {
+            this->mask |= val;
+        }
     }
-    
-    return *this;
+    return rc;
 }
 
-
-BitMask& BitMask::add(int key)
+Result BitMask::add(std::string key)
 {
-
-    if (!added) 
+    Result rc = 0;
+    auto rslt = _bin_map.find(key);
+    if (rslt == _bin_map.end())
     {
-        this->mask = key;
-        added = true;
+        std::cout << "key: \"" + key + "\" does not have a corresponding int value." << std::endl;
+        rc = 1;
     }
     else
     {
-        this->mask |= key;
+        int val = rslt->second;
+        rc = add(val);
     }
-    
-    return *this;
+    return rc;
 }
-
 
 BitMask::~BitMask()
 {

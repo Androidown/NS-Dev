@@ -4,27 +4,23 @@
 #define U32 0xFFFFFFFF
 using u64 = uint64_t;
 
-
 class XoroShiro
 {
-    public:
-        u64 seed[2];
-        u64 next_seed;
-    
+public:
+    u64 seed[2];
+    u64 next_seed;
+
     XoroShiro(u64 seed);
     u64 next();
     u64 nextInt(u64 max_int);
     u64 nextU32();
     inline void nextFrame();
-    ~XoroShiro();
 };
-
 
 inline u64 rotl(u64 x, int k)
 {
     return (x << k) | (x >> (64 - k));
 }
-
 
 inline void XoroShiro::nextFrame()
 {

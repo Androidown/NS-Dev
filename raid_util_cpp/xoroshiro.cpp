@@ -56,8 +56,3 @@ u64 XoroShiro::nextU32()
 
     return rslt;
 }
-
-XoroShiro::~XoroShiro()
-{
-    std::cout << "XoroShiro deleted." << std::endl;
-}

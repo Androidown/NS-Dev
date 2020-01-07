@@ -1,99 +1,44 @@
 #include "pm_finder.hpp"
 #include "lib/json.hpp"
 #include <fstream>
-#include <memory>
 
 using json = nlohmann::json;
-
 
 int main()
 {
     json jsn;
-    json::iterator it;
-    
+
     std::ifstream in("conf/config.json");
     in >> jsn;
     json filter = jsn["filter"];
 
-    std::shared_ptr<PMTemplate> pmtl_sp(new PMTemplate());
-    PMTemplate& pm_tmpl = *pmtl_sp;
+    PMTemplate pm_tmpl;
+
+    auto addKey = [filter] (std::string key, auto func) {
+        if (!filter[key].is_null())
+        {
+            for (auto &itor : filter[key].items())
+            {
+                if (itor.value().is_string())
+                {
+                    std::string val = itor.value();
+                    func(val);
+                }
+                else if (itor.value().is_number_unsigned())
+                {
+                    int val = itor.value();
+                    func(val);
+                }
+            }
+        }
+        std::cout << key + " loaded." << '\n';
+    };
+
     std::cout << "Process start." << '\n';
-
-    if (!filter["shiny_type"].is_null())
-    {
-        for (it=filter["shiny_type"].begin(); it != filter["shiny_type"].end(); ++it)
-        {
-            if (it.value().is_string())
-            {
-                std::string val = it.value();
-                pm_tmpl.add_shiny_type(val);
-            }
-            else if (it.value().is_number_unsigned())
-            {
-                int val = it.value();
-                pm_tmpl.add_shiny_type(val);
-            }
-            
-        }
-    }
-    std::cout << "shiny_type loaded." << '\n';
-
-    if (!filter["gender"].is_null())
-    {
-        for (it=filter["gender"].begin(); it != filter["gender"].end(); ++it)
-        {
-            if (it.value().is_string())
-            {
-                std::string val = it.value();
-                pm_tmpl.add_gender(val);
-            }
-            else if (it.value().is_number_unsigned())
-            {
-                int val = it.value();
-                pm_tmpl.add_gender(val);
-            }
-            
-        }
-    }
-    std::cout << "gender loaded." << '\n';
-
-    if (!filter["ability"].is_null())
-    {
-        for (it=filter["ability"].begin(); it != filter["ability"].end(); ++it)
-        {
-            if (it.value().is_string())
-            {
-                std::string val = it.value();
-                pm_tmpl.add_ability(val);
-            }
-            else if (it.value().is_number_unsigned())
-            {
-                int val = it.value();
-                pm_tmpl.add_ability(val);
-            }
-            
-        }
-    }
-    std::cout << "ability loaded." << '\n';
-
-    if (!filter["nature"].is_null())
-    {
-        for (it=filter["nature"].begin(); it != filter["nature"].end(); ++it)
-        {
-            if (it.value().is_string())
-            {
-                std::string val = it.value();
-                pm_tmpl.add_nature(val);
-            }
-            else if (it.value().is_number_unsigned())
-            {
-                int val = it.value();
-                pm_tmpl.add_nature(val);
-            }
-            
-        }
-    }
-    std::cout << "nature loaded." << '\n';
+    addKey("shiny_type", [&pm_tmpl] (auto val) {pm_tmpl.add_shiny_type(val);});
+    addKey("gender", [&pm_tmpl] (auto val) {pm_tmpl.add_gender(val);});
+    addKey("ability", [&pm_tmpl] (auto val) {pm_tmpl.add_ability(val);});
+    addKey("nature", [&pm_tmpl] (auto val) {pm_tmpl.add_nature(val);});
 
     if (!filter["IVs_max"].is_null())
     {
@@ -129,28 +74,28 @@ int main()
     int gender_ratio = jsn["gender_ratio"].get<int>();
     std::cout << "gender_ratio loaded." << '\n';
 
-    std::unique_ptr<PMFinder> pmf(new PMFinder(seed, iv_cnt, allow_hidden, random_gender, pm_tmpl, gender_ratio));
+    PMFinder pmf(seed, iv_cnt, allow_hidden, random_gender, pm_tmpl, gender_ratio);
 
     char key_in;
     unsigned long long cnt = 0;
 
-    loop: 
-    while(!pmf->foundPM())
+loop:
+    while (!pmf.foundPM())
     {
-    	if(++cnt % 100000000 == 0)
+        if (++cnt % 100000000 == 0)
         {
             std::cout << "Calculated " << cnt << " frames." << std::endl;
         }
-
     }
 
     std::cout << "Seed found at " << cnt << " frames." << std::endl;
-    std::cout << std::hex <<  "result seed 3frames back: " <<
-    pmf->xoro->next_seed - BASE_SEED - BASE_SEED - BASE_SEED - BASE_SEED 
-    << std::endl;
+    std::cout << std::hex << "seed 3frames back: " 
+              << pmf.xoro.next_seed - BASE_SEED * 4
+              << std::endl;
 
-    std::cout << std::hex << "result seed: " <<
-    pmf->xoro->next_seed - BASE_SEED << std::endl;
+    std::cout << std::hex << "seed: " 
+              << pmf.xoro.next_seed - BASE_SEED 
+              << std::endl;
 
     std::cout << std::dec << "Press y|Y to continue." << std::endl;
     key_in = std::cin.get();
@@ -160,4 +105,5 @@ int main()
         goto loop;
     }
 
+    return 0;
 }
