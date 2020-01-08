@@ -32,40 +32,36 @@ public:
     void setIVsMin(int *ivs);
     void setIVsMinAll(int iv);
     template <typename stroi>
-    inline PMTemplate &add_shiny_type(stroi key);
+    inline Result add_shiny_type(stroi key);
     template <typename stroi>
-    inline PMTemplate &add_nature(stroi key);
+    inline Result add_nature(stroi key);
     template <typename stroi>
-    inline PMTemplate &add_ability(stroi key);
+    inline Result add_ability(stroi key);
     template <typename stroi>
-    inline PMTemplate &add_gender(stroi key);
+    inline Result add_gender(stroi key);
     ~PMTemplate();
 };
 
 template <typename stroi>
-inline PMTemplate &PMTemplate::add_shiny_type(stroi key)
+inline Result PMTemplate::add_shiny_type(stroi key)
 {
-    _bm_shiny_type.add(key);
-    return *this;
+    return _bm_shiny_type.add(key);
 }
 
 template <typename stroi>
-inline PMTemplate &PMTemplate::add_nature(stroi key)
+inline Result PMTemplate::add_nature(stroi key)
 {
-    _bm_nature.add(key);
-    return *this;
+    return _bm_nature.add(key);
 }
 
 template <typename stroi>
-inline PMTemplate &PMTemplate::add_ability(stroi key)
+inline Result PMTemplate::add_ability(stroi key)
 {
-    _bm_ability.add(key);
-    return *this;
+    return _bm_ability.add(key);
 }
 
 template <typename stroi>
-inline PMTemplate &PMTemplate::add_gender(stroi key)
+inline Result PMTemplate::add_gender(stroi key)
 {
-    _bm_gender.add(key);
-    return *this;
+    return _bm_gender.add(key);
 }

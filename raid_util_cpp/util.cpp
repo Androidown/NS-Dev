@@ -9,12 +9,12 @@ BitMask::BitMask(int mask, STOI_MAP &bin_map)
 
 Result BitMask::add(int val)
 {
-    Result rc = 0;
+    Result rc = 1;
     if (val > _max_mask || val <= 0)
     {
         std::cout << "given value: " << val << " is not in range (0, " 
-                  << _max_mask << "]"  << std::endl;
-        rc = 1;
+                  << _max_mask << "]."  << std::endl;
+        rc = 0;
     }
     else
     {
@@ -33,12 +33,13 @@ Result BitMask::add(int val)
 
 Result BitMask::add(std::string key)
 {
-    Result rc = 0;
+    Result rc = 1;
     auto rslt = _bin_map.find(key);
     if (rslt == _bin_map.end())
     {
-        std::cout << "key: \"" + key + "\" does not have a corresponding int value." << std::endl;
-        rc = 1;
+        std::cout << "key: \"" + key + "\" does not have a corresponding int value."
+                  << std::endl;
+        rc = 0;
     }
     else
     {
@@ -46,9 +47,4 @@ Result BitMask::add(std::string key)
         rc = add(val);
     }
     return rc;
-}
-
-BitMask::~BitMask()
-{
-    std::cout << "BitMask deleted." << std::endl;
 }

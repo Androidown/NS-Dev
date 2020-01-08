@@ -1,17 +1,16 @@
 {
   "seed": "0x6079AD03756216AE", 
-  "iv_count": 4, 
-  "allow_hidden": true, 
+  "iv_count": 2, 
+  "allow_hidden": false, 
   "random_gender": false,
   "gender_ratio": 127,
 
   "filter": {
-    "shiny_type": ["null"],
-    "IVs_min": [31, 31, 31, 0, 31, 0],
+    "shiny_type": ["star", "square"],
+    "IVs_min": [31, 31, 31, 31, 31, 0],
     "IVs_max": [31, 31, 31, 31, 31, 0],
     "ability": [1, 2],
-    "gender": ["female", "male"],
-    "nature": ["Brave"]
+    "gender": ["female", "male"]
   }
 
 }

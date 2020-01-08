@@ -7,6 +7,7 @@ using json = nlohmann::json;
 int main()
 {
     json jsn;
+    Result main_rc;
 
     std::ifstream in("conf/config.json");
     in >> jsn;
@@ -14,7 +15,10 @@ int main()
 
     PMTemplate pm_tmpl;
 
-    auto addKey = [filter] (std::string key, auto func) {
+    auto keyAddList = [&filter] (std::string key, auto&& func) -> Result
+    {
+        Result rc = 1;
+        std::cout << "loading " + key + "..." << '\n';
         if (!filter[key].is_null())
         {
             for (auto &itor : filter[key].items())
@@ -22,23 +26,33 @@ int main()
                 if (itor.value().is_string())
                 {
                     std::string val = itor.value();
-                    func(val);
+                    rc = std::forward<decltype(func)>(func)(val);
                 }
                 else if (itor.value().is_number_unsigned())
                 {
                     int val = itor.value();
-                    func(val);
+                    rc = std::forward<decltype(func)>(func)(val);
                 }
+                if (R_FAILED(rc)) break;
             }
+            if (R_SUCCEED(rc))
+                std::cout << key + " loaded." << '\n';
         }
-        std::cout << key + " loaded." << '\n';
+        else
+        {
+            std::cout << key + " unspecified, use default config." << '\n';
+        }
+        
+        return rc;
     };
 
     std::cout << "Process start." << '\n';
-    addKey("shiny_type", [&pm_tmpl] (auto val) {pm_tmpl.add_shiny_type(val);});
-    addKey("gender", [&pm_tmpl] (auto val) {pm_tmpl.add_gender(val);});
-    addKey("ability", [&pm_tmpl] (auto val) {pm_tmpl.add_ability(val);});
-    addKey("nature", [&pm_tmpl] (auto val) {pm_tmpl.add_nature(val);});
+    main_rc = keyAddList("shiny_type", [&pm_tmpl] (auto val) {return pm_tmpl.add_shiny_type(val);}) &&
+              keyAddList("gender", [&pm_tmpl] (auto val) {return pm_tmpl.add_gender(val);}) &&
+              keyAddList("ability", [&pm_tmpl] (auto val) {return pm_tmpl.add_ability(val);}) &&
+              keyAddList("nature", [&pm_tmpl] (auto val) {return pm_tmpl.add_nature(val);});
+
+    if (R_FAILED(main_rc)) return 0;
 
     if (!filter["IVs_max"].is_null())
     {
@@ -105,5 +119,5 @@ loop:
         goto loop;
     }
 
-    return 0;
+    return 1;
 }
