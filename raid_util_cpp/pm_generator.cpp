@@ -44,7 +44,7 @@ void PMGenerator::_setShiny()
 
 void PMGenerator::_setIVs()
 {
-    ivs = {-1, -1, -1, -1, -1, -1}
+    ivs = {-1, -1, -1, -1, -1, -1};
     int i = 0;
     int stat;
 
