@@ -1,9 +1,7 @@
 #include "pm_finder.hpp"
 
-PMFinder::PMFinder(u64 seed, int iv_count, bool allow_hidden,
-                   bool random_gender, PMTemplate &pm_tmpl, u64 gender_ratio)
-    : xoro(seed), iv_cnt(iv_count), allow_hidden(allow_hidden),
-      random_gender(random_gender), gender_ratio(gender_ratio)
+PMFinder::PMFinder(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info)
+    : xoro(seed), pm_info(pm_info)
 {
     pm_tmpl.numerize();
     for (int i = 0; i < 6; i++)
@@ -43,7 +41,7 @@ bool PMFinder::_checkIVs()
     int stat, iv;
     bool rtn_code = true;
 
-    while (i < iv_cnt)
+    while (i < pm_info.iv_cnt)
     {
         stat = xoro.nextInt(6);
         if (_IVs_max[stat] != 31)
@@ -64,7 +62,7 @@ bool PMFinder::_checkIVs()
         {
             if (ivs[i] == -1)
             {
-                iv = xoro.nextInt(32);
+                iv = xoro.nextIntP2(32);
                 if (_IVs_min[i] > iv || iv > _IVs_max[i])
                 {
                     rtn_code = false;
@@ -81,10 +79,10 @@ bool PMFinder::_checkAbility()
 {
     int ability;
 
-    if (allow_hidden)
+    if (pm_info.allow_hidden)
         ability = 1 << xoro.nextInt(3);
     else
-        ability = 1 << xoro.nextInt(2);
+        ability = 1 << xoro.nextIntP2(2);
 
     return ability & _ability;
 }
@@ -92,9 +90,9 @@ bool PMFinder::_checkAbility()
 bool PMFinder::_checkGender()
 {
 
-    if (random_gender)
+    if (pm_info.random_gender)
     {
-        int gender = 1 << (xoro.nextInt(252) + 1 < gender_ratio);
+        int gender = 1 << (xoro.nextInt(252) + 1 < pm_info.gender_ratio);
         return gender & _gender;
     }
     else

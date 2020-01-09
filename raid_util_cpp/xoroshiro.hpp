@@ -1,8 +1,8 @@
-#include <iostream>
+#ifndef XOROSHIRO_H
+#define XOROSHIRO_H
 
-#define BASE_SEED 0x82A2B175229D6A5B
-#define U32 0xFFFFFFFF
-using u64 = uint64_t;
+#include <iostream>
+#include "lib/const.hpp"
 
 class XoroShiro
 {
@@ -14,6 +14,7 @@ public:
     u64 next();
     u64 nextInt(u64 max_int);
     u64 nextU32();
+    u64 nextIntP2(u64 int_p2);
     inline void nextFrame();
 };
 
@@ -28,3 +29,5 @@ inline void XoroShiro::nextFrame()
     seed[1] = BASE_SEED;
     next_seed += BASE_SEED;
 }
+
+#endif

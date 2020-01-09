@@ -1,20 +1,16 @@
 #include <vector>
 #include <math.h>
 #include "pm_template.hpp"
+#include "lib/const.hpp"
 
 PMTemplate::PMTemplate()
     :_bm_shiny_type(0b111, *_shiny_type_map), _bm_ability(0b111, *_ability_map),
      _bm_gender(0b111, *_gender_map), _bm_nature(0x1ffffff, *_nature_map)
 {
-    std::vector<std::string> nature_list = {
-        "Hardy", "Lonely", "Brave", "Adamant", "Naughty", "Bold", "Docile", "Relaxed",
-        "Impish", "Lax", "Timid", "Hasty", "Serious", "Jolly", "Naive", "Modest",
-        "Mild", "Quiet", "Bashful", "Rash", "Calm", "Gentle", "Sassy", "Careful", "Quirky"
-    };
 
-    for (unsigned int i = 0; i < nature_list.size(); i++)
+    for (unsigned int i = 0; i < NATURES.size(); i++)
     {
-        (*_nature_map)[nature_list[i]] = 1 << i;
+        (*_nature_map)[NATURES[i]] = 1 << i;
     }
 }
 

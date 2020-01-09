@@ -1,3 +1,6 @@
+#ifndef PM_TEMPLATE_H
+#define PM_TEMPLATE_H
+
 #include <iostream>
 #include <memory>
 #include "util.hpp"
@@ -65,3 +68,5 @@ inline Result PMTemplate::add_gender(stroi key)
 {
     return _bm_gender.add(key);
 }
+
+#endif

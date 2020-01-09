@@ -1,4 +1,5 @@
 #include "pm_finder.hpp"
+#include "pm_generator.hpp"
 #include "lib/json.hpp"
 #include <fstream>
 
@@ -70,7 +71,8 @@ int main()
 
     if (jsn["seed"].is_null())
     {
-        throw "seed is not presented.\n";
+        std::cout << "seed is not presented." << '\n';
+        return 0;
     }
 
     u64 seed = std::stoull(jsn["seed"].get<std::string>(), nullptr, 16);
@@ -85,10 +87,12 @@ int main()
     int iv_cnt = jsn["iv_count"].get<int>();
     std::cout << "iv_count loaded." << '\n';
 
-    int gender_ratio = jsn["gender_ratio"].get<int>();
+    u64 gender_ratio = jsn["gender_ratio"].get<u64>();
     std::cout << "gender_ratio loaded." << '\n';
 
-    PMFinder pmf(seed, iv_cnt, allow_hidden, random_gender, pm_tmpl, gender_ratio);
+    PMInfo pm_info = {iv_cnt, allow_hidden, random_gender, gender_ratio};
+    PMFinder pmf(seed, pm_tmpl, pm_info);
+    PMGenerator pmg(pm_info, 1234, 2345);
 
     char key_in;
     unsigned long long cnt = 0;
@@ -107,9 +111,8 @@ loop:
               << pmf.xoro.next_seed - BASE_SEED * 4
               << std::endl;
 
-    std::cout << std::hex << "seed: " 
-              << pmf.xoro.next_seed - BASE_SEED 
-              << std::endl;
+    pmg.setSeed(pmf.xoro.next_seed - BASE_SEED);
+    pmg.display();
 
     std::cout << std::dec << "Press y|Y to continue." << std::endl;
     key_in = std::cin.get();

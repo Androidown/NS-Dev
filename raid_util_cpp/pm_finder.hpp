@@ -1,6 +1,10 @@
+#ifndef PM_FINDER_H
+#define PM_FINDER_H
+
 #include <iostream>
 #include "xoroshiro.hpp"
 #include "pm_template.hpp"
+#include "lib/const.hpp"
 
 class PMFinder
 {
@@ -19,11 +23,10 @@ private:
 
 public:
     XoroShiro xoro;
-    int iv_cnt;
-    bool allow_hidden;
-    bool random_gender;
-    u64 gender_ratio;
+    PMInfo& pm_info;
     bool foundPM();
 
-    PMFinder(u64 seed, int iv_count, bool allow_hidden, bool random_gender, PMTemplate &pm_tmpl, u64 gender_ratio);
+    PMFinder(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info);
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef UTIL_H
+#define UTIL_H
+
 #include <iostream>
 #include <unordered_map>
 #define R_SUCCEED(rc) ((rc)==1)?true:false
@@ -20,3 +23,5 @@ public:
     Result add(int key);
     Result add(std::string key);
 };
+
+#endif

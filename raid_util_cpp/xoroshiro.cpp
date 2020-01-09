@@ -56,3 +56,10 @@ u64 XoroShiro::nextU32()
 
     return rslt;
 }
+
+u64 XoroShiro::nextIntP2(u64 int_p2)
+{
+    // if the max_int is power of 2, then this method 
+    // should be used with regard of efficiency.
+    return (int_p2 - 1) & next();
+}
