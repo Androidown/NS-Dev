@@ -1,0 +1,24 @@
+{
+  "seed": "0x6079AD03756216AE", 
+
+  "filter": {
+    "shiny_type": ["square"],
+    "IVs_min": [31, 31, 31, 31, 31, 0],
+    "IVs_max": [31, 31, 31, 31, 31, 0],
+    "ability": [1, 2],
+    "gender": ["female", "male"]
+  },
+
+  "parent": {
+    "ivs": [31, 31, 31, 31, 31, 0],
+    "ability": 2, 
+    "random_gender": true,
+    "gender_ratio": 127,
+    "destiny_knot": true,
+    "everstone": true,
+    "random_species": false,
+    "masuada": true,
+    "shiny_charm": true
+  }
+
+}
