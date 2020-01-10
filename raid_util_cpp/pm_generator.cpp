@@ -24,7 +24,7 @@ void PMGenerator::_setShiny()
 
     if (otsv == psv)
     {
-        shiny_type = "squa";
+        shiny_type = "quad";
         u64 high = (pid & 0xffff) ^ real_tsv ^ 0;
         pid = (high << 16) | (pid & 0xffff);
     }
