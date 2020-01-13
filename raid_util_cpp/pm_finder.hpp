@@ -27,6 +27,7 @@ public:
     bool foundPM();
 
     PMFinder(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info);
+    PMFinder(u64 seed, u64 base_seed, PMTemplate &pm_tmpl, PMInfo& pm_info);
 };
 
 #endif

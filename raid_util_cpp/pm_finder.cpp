@@ -16,6 +16,22 @@ PMFinder::PMFinder(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info)
     _gender = pm_tmpl.gender;
 }
 
+PMFinder::PMFinder(u64 seed, u64 base_seed, PMTemplate &pm_tmpl, PMInfo& pm_info)
+    : xoro(seed, base_seed), pm_info(pm_info)
+{
+    pm_tmpl.numerize();
+    for (int i = 0; i < 6; i++)
+    {
+        _IVs_min[i] = pm_tmpl.IVs_min[i];
+        _IVs_max[i] = pm_tmpl.IVs_max[i];
+    }
+
+    _shiny_type = pm_tmpl.shiny_type;
+    _nature = pm_tmpl.nature;
+    _ability = pm_tmpl.ability;
+    _gender = pm_tmpl.gender;
+}
+
 bool PMFinder::_checkShiny()
 {
     bool rtn_code;

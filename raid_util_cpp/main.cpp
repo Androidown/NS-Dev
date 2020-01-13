@@ -1,6 +1,7 @@
 #include "pm_finder.hpp"
 #include "pm_generator.hpp"
 #include "lib/json.hpp"
+#include "thread_manager.hpp"
 #include <fstream>
 
 using json = nlohmann::json;
@@ -91,27 +92,23 @@ int main()
     std::cout << "gender_ratio loaded." << '\n';
 
     PMInfo pm_info = {iv_cnt, allow_hidden, random_gender, gender_ratio};
-    PMFinder pmf(seed, pm_tmpl, pm_info);
+
+    u64 thread_num = jsn["threads"].get<u64>();
+    std::cout << "threads loaded." << '\n';
+    ThreadManager tmgr(seed, pm_tmpl, pm_info, thread_num);
+
+
     PMGenerator pmg(pm_info, 1234, 2345);
 
     char key_in;
-    unsigned long long cnt = 0;
 
 loop:
-    while (!pmf.foundPM())
-    {
-        if (++cnt % 100000000 == 0)
-        {
-            std::cout << "Calculated " << cnt << " frames." << std::endl;
-        }
-    }
-
-    std::cout << "Seed found at " << cnt << " frames." << std::endl;
+    tmgr.runAll();
     std::cout << std::hex << "seed 3frames back: " 
-              << pmf.xoro.next_seed - BASE_SEED * 4
+              << tmgr.rslt_seed - BASE_SEED * 3
               << std::endl;
 
-    pmg.setSeed(pmf.xoro.next_seed - BASE_SEED);
+    pmg.setSeed(tmgr.rslt_seed);
     pmg.display();
 
     std::cout << std::dec << "Press y|Y to continue." << std::endl;

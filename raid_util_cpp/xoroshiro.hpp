@@ -6,10 +6,14 @@
 
 class XoroShiro
 {
-public:
+private:
     u64 seed[2];
+    u64 base_seed;
+
+public:
     u64 next_seed;
 
+    XoroShiro(u64 seed, u64 base_seed);
     XoroShiro(u64 seed);
     u64 next();
     u64 nextInt(u64 max_int);
@@ -27,7 +31,7 @@ inline void XoroShiro::nextFrame()
 {
     seed[0] = next_seed;
     seed[1] = BASE_SEED;
-    next_seed += BASE_SEED;
+    next_seed += base_seed;
 }
 
 #endif

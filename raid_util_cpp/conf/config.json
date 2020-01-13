@@ -5,12 +5,15 @@
   "random_gender": true,
   "gender_ratio": 127,
 
+  "threads": 4,
+
   "filter": {
     "shiny_type": ["square"],
     "IVs_min": [31, 31, 31, 0, 31, 0],
     "IVs_max": [31, 31, 31, 31, 31, 0],
     "ability": [1, 2],
-    "gender": ["female", "male"]
+    "gender": ["female", "male"],
+    "nature": ["Brave"]
   }
 
 }

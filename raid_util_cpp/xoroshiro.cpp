@@ -14,11 +14,16 @@ u64 _nextP2(u64 x)
 }
 
 
-XoroShiro::XoroShiro(u64 seed)
+XoroShiro::XoroShiro(u64 seed, u64 base_seed)
+    :seed{seed, BASE_SEED}, base_seed(base_seed)
 {
-    this->seed[0] = seed;
-    this->seed[1] = BASE_SEED;
-    next_seed = seed + BASE_SEED;
+    next_seed = seed + base_seed;
+}
+
+XoroShiro::XoroShiro(u64 seed)
+    :seed{seed, BASE_SEED}, base_seed(BASE_SEED)
+{
+    next_seed = seed + base_seed;
 }
 
 u64 XoroShiro::next()
