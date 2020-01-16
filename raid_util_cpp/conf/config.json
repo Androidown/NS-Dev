@@ -1,10 +1,12 @@
 {
   "seed": "0x6079AD03756216AE", 
   "iv_count": 4, 
-  "allow_hidden": false, 
+  "allow_hidden": false,
   "random_gender": true,
   "gender_ratio": 127,
 
+  "ttid": 12345,
+  "tsid": 23455,
   "threads": 4,
 
   "filter": {

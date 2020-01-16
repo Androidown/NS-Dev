@@ -8,7 +8,7 @@ class XoroShiro
 {
 private:
     u64 seed[2];
-    u64 base_seed;
+    const u64 base_seed;
 
 public:
     u64 next_seed;
@@ -34,4 +34,4 @@ inline void XoroShiro::nextFrame()
     next_seed += base_seed;
 }
 
-#endif
+#endif  // XOROSHIRO_H

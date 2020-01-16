@@ -1,6 +1,6 @@
 #include "pm_finder.hpp"
 
-PMFinder::PMFinder(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info)
+PMFinder::PMFinder(u64 seed, PMTemplate &pm_tmpl, const PMInfo& pm_info)
     : xoro(seed), pm_info(pm_info)
 {
     pm_tmpl.numerize();
@@ -16,7 +16,7 @@ PMFinder::PMFinder(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info)
     _gender = pm_tmpl.gender;
 }
 
-PMFinder::PMFinder(u64 seed, u64 base_seed, PMTemplate &pm_tmpl, PMInfo& pm_info)
+PMFinder::PMFinder(u64 seed, u64 base_seed, PMTemplate &pm_tmpl, const PMInfo& pm_info)
     : xoro(seed, base_seed), pm_info(pm_info)
 {
     pm_tmpl.numerize();

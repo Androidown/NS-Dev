@@ -12,16 +12,16 @@ using Result = int;
 class BitMask
 {
 private:
-    int _max_mask;
+    const int _max_mask;
     bool _added = false;
-    STOI_MAP &_bin_map;
+    const STOI_MAP &_bin_map;
 
 public:
     int mask;
 
-    BitMask(int mask, STOI_MAP &bin_map);
+    BitMask(int mask, const STOI_MAP &bin_map);
     Result add(int key);
     Result add(std::string key);
 };
 
-#endif
+#endif  // UTIL_H

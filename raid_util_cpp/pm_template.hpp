@@ -30,9 +30,9 @@ public:
     PMTemplate();
     void numerize();
     void setIVsMax(int index, int iv);
-    void setIVsMax(int *ivs);
+    void setIVsMax(const int *ivs);
     void setIVsMin(int index, int iv);
-    void setIVsMin(int *ivs);
+    void setIVsMin(const int *ivs);
     void setIVsMinAll(int iv);
     template <typename stroi>
     inline Result add_shiny_type(stroi key);
@@ -69,4 +69,4 @@ inline Result PMTemplate::add_gender(stroi key)
     return _bm_gender.add(key);
 }
 
-#endif
+#endif  // PM_TEMPLATE_H

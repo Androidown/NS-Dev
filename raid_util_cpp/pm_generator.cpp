@@ -1,14 +1,14 @@
 #include "pm_generator.hpp"
 #include <iomanip>
 
-PMGenerator::PMGenerator(u64 seed, PMInfo& pm_info, u64 ttid, u64 tsid)
+PMGenerator::PMGenerator(u64 seed, const PMInfo& pm_info, u64 ttid, u64 tsid)
     :seed(seed), pm_info(pm_info), real_tsv(ttid ^ tsid)
 {
     xoro = new XoroShiro(seed);
 }
 
 
-PMGenerator::PMGenerator(PMInfo& pm_info, u64 ttid, u64 tsid)
+PMGenerator::PMGenerator(const PMInfo& pm_info, u64 ttid, u64 tsid)
     :pm_info(pm_info), real_tsv(ttid ^ tsid)
 {
 }
@@ -114,15 +114,16 @@ void PMGenerator::setSeed(u64 seed)
 
     if (this->xoro) delete this->xoro;
     this->xoro = new XoroShiro(seed);
-}
 
-void PMGenerator::display()
-{
     _setShiny();
     _setIVs();
     _setAbility();
     _setGender();
     _setNature();
+}
+
+void PMGenerator::display() const
+{
     std::cout << "------------------------------------------------------------------------------------"
               << std::endl; 
 

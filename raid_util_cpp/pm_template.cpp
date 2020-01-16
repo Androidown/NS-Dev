@@ -31,7 +31,7 @@ void PMTemplate::setIVsMin(int index, int iv)
     IVs_min[index] = val;
 }
 
-void PMTemplate::setIVsMin(int *ivs)
+void PMTemplate::setIVsMin(const int *ivs)
 {
     int val;
     for (int i = 0; i < 6; i++)
@@ -63,7 +63,7 @@ void PMTemplate::setIVsMax(int index, int iv)
     IVs_max[index] = val;
 }
 
-void PMTemplate::setIVsMax(int *ivs)
+void PMTemplate::setIVsMax(const int *ivs)
 {
     int val;
     for (int i = 0; i < 6; i++)

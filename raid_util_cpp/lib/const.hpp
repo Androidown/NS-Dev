@@ -21,4 +21,4 @@ typedef struct {
     u64 gender_ratio;
 } PMInfo;
 
-#endif
+#endif  // LIB_CONST_H

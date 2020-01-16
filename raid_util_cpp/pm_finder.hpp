@@ -23,11 +23,11 @@ private:
 
 public:
     XoroShiro xoro;
-    PMInfo& pm_info;
+    const PMInfo& pm_info;
     bool foundPM();
 
-    PMFinder(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info);
-    PMFinder(u64 seed, u64 base_seed, PMTemplate &pm_tmpl, PMInfo& pm_info);
+    PMFinder(u64 seed, PMTemplate &pm_tmpl, const PMInfo& pm_info);
+    PMFinder(u64 seed, u64 base_seed, PMTemplate &pm_tmpl, const PMInfo& pm_info);
 };
 
-#endif
+#endif  // PM_FINDER_H

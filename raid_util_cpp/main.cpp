@@ -20,7 +20,7 @@ int main()
     auto keyAddList = [&filter] (std::string key, auto&& func) -> Result
     {
         Result rc = 1;
-        std::cout << "loading " + key + "..." << '\n';
+        // std::cout << "loading " + key + "..." << '\n';
         if (!filter[key].is_null())
         {
             for (auto &itor : filter[key].items())
@@ -48,7 +48,10 @@ int main()
         return rc;
     };
 
-    std::cout << "Process start." << '\n';
+    std::cout << "------------------\n" 
+              << "| Load config... |\n" 
+              << "------------------" << '\n';
+
     main_rc = keyAddList("shiny_type", [&pm_tmpl] (auto val) {return pm_tmpl.add_shiny_type(val);}) &&
               keyAddList("gender", [&pm_tmpl] (auto val) {return pm_tmpl.add_gender(val);}) &&
               keyAddList("ability", [&pm_tmpl] (auto val) {return pm_tmpl.add_ability(val);}) &&
@@ -97,15 +100,22 @@ int main()
     std::cout << "threads loaded." << '\n';
     ThreadManager tmgr(seed, pm_tmpl, pm_info, thread_num);
 
-
-    PMGenerator pmg(pm_info, 1234, 2345);
+    u64 ttid = jsn["ttid"].get<u64>();
+    std::cout << "ttid loaded." << '\n';
+    u64 tsid = jsn["tsid"].get<u64>();
+    std::cout << "tsid loaded." << '\n';
+    
+    PMGenerator pmg(pm_info, ttid, tsid);
 
     char key_in;
+    std::cout << "----------------------\n"
+              << "| Start searching... |\n"
+              << "----------------------" << '\n';
 
 loop:
     tmgr.runAll();
-    std::cout << std::hex << "seed 3frames back: " 
-              << tmgr.rslt_seed - BASE_SEED * 3
+    std::cout << std::hex << "\n>>> Seed 3 frames back: " 
+              << tmgr.rslt_seed - BASE_SEED * 3 << '\n'
               << std::endl;
 
     pmg.setSeed(tmgr.rslt_seed);

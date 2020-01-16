@@ -1,6 +1,6 @@
 #include "thread_manager.hpp"
 
-ThreadManager::ThreadManager(u64 seed, PMTemplate &pm_tmpl, PMInfo& pm_info, int thread_num)
+ThreadManager::ThreadManager(u64 seed, PMTemplate &pm_tmpl, const PMInfo& pm_info, int thread_num)
     :seed(seed), pm_tmpl(pm_tmpl), pm_info(pm_info), thread_num(std::min(16, thread_num))
 {
     u64 base_seed = BASE_SEED * thread_num;
@@ -38,12 +38,13 @@ void ThreadManager::singleRunner(int id)
         if (++cnt % 100000000 == 0)
         {
             mtx.lock();
-            std::cout << "[thread-" << id <<"] Calculated " << cnt << " frames." << std::endl;
+            std::cout << "[thread-" << id <<"] Searched " << cnt << " frames." << std::endl;
             mtx.unlock();
         }
     }
     if (exec_flag)
     {
+        mtx.lock();
         std::cout << "[thread-" << id <<"] Seed found at " << cnt*thread_num + id << " frames." << std::endl;
         mtx.unlock();
         exec_flag.store(false);

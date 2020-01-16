@@ -9,8 +9,8 @@ class PMGenerator
 private:
     u64 seed;
     XoroShiro* xoro = 0;
-    PMInfo& pm_info; 
-    u64 real_tsv;
+    const PMInfo& pm_info;
+    const u64 real_tsv;
 
     u64 ec;
     u64 pid;
@@ -26,13 +26,13 @@ private:
     void _setNature();
 
 public:
-    PMGenerator(u64 seed, PMInfo& pm_info, u64 ttid, u64 tsid);
-    PMGenerator(PMInfo& pm_info, u64 ttid, u64 tsid);
+    PMGenerator(u64 seed, const PMInfo& pm_info, u64 ttid, u64 tsid);
+    PMGenerator(const PMInfo& pm_info, u64 ttid, u64 tsid);
 
-    void display();
+    void display() const;
     void setSeed(u64 seed);
 
     ~PMGenerator();
 };
 
-#endif
+#endif  // PM_GENERATOR_H
